@@ -1,0 +1,48 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png/x-icon" href="photos\gradious-pay-logo-final.png">
+    <title>Gradious Pay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+<div class="mobile-container">
+    <header class="top-bar">
+      <i class="fas fa-arrow-left" style="color: white;" onclick="navigateTo('index.html')"></i>
+      <h2>Send Money</h2>
+      <div></div>
+    </header>
+
+    <main class="home-main">
+      <input type="text" class="search-input" placeholder="Search phone number or UPI ID" />
+
+      <h4 style="margin: 16px 0 10px;">Recent Contacts</h4>
+      <div class="contact-list">
+        <div class="contact-item" onclick="navigateTo('chat_users.html')">
+          <i class="fas fa-user"></i> <span>Rahul Sharma</span>
+        </div>
+        <div class="contact-item" onclick="navigateTo('chat_users.html')">
+          <i class="fas fa-user"></i> <span>Anusha Reddy</span>
+        </div>
+        <div class="contact-item" onclick="navigateTo('chat_users.html')">
+          <i class="fas fa-user"></i> <span>Mom</span>
+        </div>
+      </div>
+    </main>
+  </div>
+
+
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>

@@ -1,0 +1,23 @@
+id proff
+automatic email after approval
+custiomer id - phone
+first login - flag
+
+mock api accounts
+mockup screen/ wire frames
+
+login/ signup
+admin page
+
+
+transantion history
+
+window.location = --> to navigate to next pages with ot using the href
+
+jsbin website
+
+
+passwords should be encrypted
+
+endusers
+personnels

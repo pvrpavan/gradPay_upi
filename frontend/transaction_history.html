@@ -1,0 +1,52 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <link rel="icon" type="image/png/x-icon" href="photos\gradious-pay-logo-final.png">
+    <title>Gradious Pay</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+        integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+        crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+ <div class="mobile-wrapper">
+    <header class="top-bar">
+      <h2>Transaction History</h2>
+    </header>
+
+    <main class="transactions-main">
+      <ul class="transaction-list">
+        <li class="transaction-item">+ ₹500 from Rahul <span class="status success">Received</span></li>
+        <li class="transaction-item">- ₹200 to Swiggy <span class="status sent">Sent</span></li>
+        <li class="transaction-item">- ₹1000 to Rent <span class="status sent">Sent</span></li>
+      </ul>
+    </main>
+
+    <nav class="bottom-nav">
+      <div class="nav-item" onclick="navigateTo('index.html')">
+        <i class="fas fa-home"></i><span>Home</span>
+      </div>
+      <div class="nav-item" onclick="navigateTo('scanner_page.html')">
+        <i class="fas fa-qrcode"></i><span>Scanner</span>
+      </div>
+      <div class="nav-item " onclick="navigateTo('expense_tracker.html')">
+        <i class="fas fa-chart-line"></i><span>tracker</span>
+      </div>
+      <div class="nav-item active" onclick="navigateTo('transaction_history.html')">
+        <i class="fas fa-receipt"></i><span>transaction</span>
+      </div>
+    </nav>
+  </div>
+
+
+
+
+    <script src="script.js"></script>
+</body>
+
+</html>

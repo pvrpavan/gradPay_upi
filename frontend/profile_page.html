@@ -1,0 +1,187 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <link rel="icon" type="image/png/x-icon" href="photos\gradious-pay-logo-final.png">
+  <title>Gradious Pay</title>
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css"
+    integrity="sha512-Evv84Mr4kqVGRNSgIGL/F/aIDqQb7xQ2vcrdIwxfjThSH8CSR7PBEakCr51Ck+w+/U6swU2Im1vVX0SVk9ABhg=="
+    crossorigin="anonymous" referrerpolicy="no-referrer" />
+  <link rel="stylesheet" href="style.css">
+
+</head>
+
+<body>
+
+  <div class="profile-container">
+
+
+    <div class="profile-header-bar">
+      <div class="profile-left">
+        <div style="display: flex; flex-direction: row; align-items: center; gap:20px;">
+          <i class="fas fa-arrow-left icon-btn" onclick="navigateTo('index.html')"></i>
+        </div>
+        <img src="photos/my-profile.png" alt="Profile" class="profile-avatar" />
+        <div class="profile-info">
+          <p class="greeting">Welcome back,</p>
+          <h3 class="username">PVR PAVAN</h3>
+          <div class="profile-badge"><i class="fa-solid fa-star" style="color: #f65e1d;"></i> Verified User</div>
+        </div>
+      </div>
+      <button class="qr-cont">
+        <img src="photos\qr-image.png" alt="QR Code" class="qr-code" />
+      </button>
+    </div>
+
+    <!-- Personal Details + UPI -->
+    <div class="details-upi-wrapper">
+      <div class="personal-details" id="personal-details">
+        <h3>Personal Details</h3>
+        <p><strong>Name:</strong> <span id="user-name">MR. PVR</span></p>
+        <p><strong>Phone:</strong> <span id="user-phone">+91-8555835196</span></p>
+        <p id="add-email" class="clickable">+ Add Email</p>
+      </div>
+
+      <div class="upi-card" id="upiIds">
+        <h4>UPI ID's</h4>
+        <p>john@gradious</p>
+        <p>doe@ybl</p>
+      </div>
+    </div>
+
+
+    <div class="referral-strip">
+      <div class="referral-text">
+        <p>Referred by a friend?</p>
+        <span>Enter their referral code below</span>
+      </div>
+      <div class="referral-action">
+        <input type="text" id="referralCode" placeholder="Referral code" />
+        <button onclick="applyReferral()">Apply</button>
+      </div>
+    </div>
+
+
+
+    <!-- Settings Options -->
+    <div class="profile-settings-list">
+
+      <div class="settings-card">
+        <div class="icon-label">
+          <span class="profile-btns-icon"><i class="fa-solid fa-gift" style="color: #f65e1d;"></i></span>
+          <span class="label">Referral</span>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+
+      <div class="settings-card">
+        <div class="icon-label">
+          <span class="profile-btns-icon"><i class="fa-solid fa-gear" style="color: #f65e1d;"></i></span>
+          <span class="label">Settings</span>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+
+      <div class="settings-card">
+        <div class="icon-label" onclick="navigateTo('faqs_page.html')">
+          <span class="profile-btns-icon"><i class="fa-solid fa-circle-info" style="color: #f65e1d;"></i></span>
+          <span class="label">About GradiousPay</span>
+        </div>
+        <span class="arrow">›</span>
+      </div>
+
+      <div class="settings-card" onclick="navigateTo('sign_up_or_login.html')">
+        <div class="icon-label">
+          <span class="profile-btns-icon"><i class="fa-solid fa-right-from-bracket" style="color: #f65e1d;"></i></span>
+          <span class="label danger">Log Out</span>
+        </div>
+        <span class="arrow danger">›</span>
+      </div>
+
+    </div>
+  </div>
+
+
+
+
+  <script src="script.js"></script>
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const phone = localStorage.getItem("phone");
+
+      if (!phone) {
+        alert("User not logged in. Redirecting to login page.");
+        window.location.href = "sign_up_or_login.html"; // redirect to login page
+        return;
+      }
+
+      fetchProfile(phone);
+    });
+
+    function fetchProfile(phone) {
+      fetch(`http://localhost:5000/api/auth/profile?phone=${phone}`)
+        .then((res) => {
+          if (!res.ok) throw new Error("User not found");
+          return res.json();
+        })
+        .then((data) => {
+          const user = data.user;
+
+          // Fill user details
+          document.querySelector(".username").textContent = user.name || "User";
+          document.getElementById("user-name").textContent = user.name || "N/A";
+          document.getElementById("user-phone").textContent = "+91-" + user.phone;
+
+          // Email display
+          if (user.email) {
+            const emailP = document.createElement("p");
+            emailP.innerHTML = `<strong>Email:</strong> ${user.email}`;
+            document.getElementById("personal-details").appendChild(emailP);
+            document.getElementById("add-email").style.display = "none";
+          }
+
+          // UPI IDs display
+          if (user.upiIds && user.upiIds.length > 0) {
+            const upiBox = document.getElementById("upiIds");
+            upiBox.innerHTML = "<h4>UPI ID's</h4>";
+            user.upiIds.forEach((upi) => {
+              const p = document.createElement("p");
+              p.textContent = upi;
+              upiBox.appendChild(p);
+            });
+          }
+
+          // Referral code section (optional)
+          if (user.referredBy) {
+            document.getElementById("referralCode").value = user.referredBy;
+          }
+        })
+        .catch((err) => {
+          alert("Failed to load profile: " + err.message);
+          window.location.href = "sign_up_or_login.html";
+        });
+    }
+
+    // Apply referral code (if needed)
+    function applyReferral() {
+      const code = document.getElementById("referralCode").value;
+      if (!code) {
+        alert("Please enter a referral code");
+        return;
+      }
+      alert("Referral code applied: " + code);
+      // optionally send to backend
+    }
+
+    // Navigation helper
+    function navigateTo(page) {
+      window.location.href = page;
+    }
+
+
+  </script>
+</body>
+
+</html>
