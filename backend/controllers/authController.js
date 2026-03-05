@@ -89,39 +89,32 @@ const createAccount = async (req, res) => {
   const { displayName, password, phone, email } = req.body;
 
   try {
-    const existingUser = await User.findOne({ phone: phone });
-    if (existingUser.password != "default") return res.status(400).json({ error: "User already exists" });
-    const upi_id = `${displayName.toLowerCase().replace(/\s+/g, "")}.${phone.slice(-4)}@gradpay`;
+    const existingUser = await User.findOne({ phone });
+    if (!existingUser) return res.status(404).json({ error: "User not found. Please verify OTP first." });
+    if (existingUser.password !== "default") return res.status(400).json({ error: "User already exists" });
 
-    User.updateMany(
-      { "phone": phone },
+    const upi_id_main = `${displayName.toLowerCase().replace(/\s+/g, "")}.${phone.slice(-4)}@gradpay`;
+    const upi_ids = [upi_id_main, `${phone}@gradious`];
+
+    const qrCodeData = await qrcode.toDataURL(`upi://pay?pa=${upi_id_main}&pn=${encodeURIComponent(displayName)}`);
+
+    const updatedUser = await User.findOneAndUpdate(
+      { phone },
       {
         $set: {
-          displayName: displayName,
-          email: email,
-          password: password,
-          phone: phone,
-          upi_id: upi_id,
+          displayName,
+          email: email || "",
+          password,
+          upi_id: upi_ids,
           balance: 5000,
-          qr_code_url: "",
+          qr_code_url: qrCodeData,
           profile_photo_url: ""
         }
-      }
-    )
-    // const newUser = new User({
-    //   displayName,
-    //   email,
-    //   password,
-    //   phone,
-    //   upi_id,
-    //   // bank_account,
-    //   // bank_name,
-    //   balance: 5000,
-    //   qr_code_url: "",
-    //   profile_photo_url: "",
-    // });
+      },
+      { new: true }
+    );
 
-    res.status(201).json({ message: "Account created", user: existingUser });
+    res.status(201).json({ message: "Account created", user: updatedUser });
 
   } catch (err) {
     console.error(err);
@@ -155,9 +148,30 @@ const getProfile = async (req, res) => {
 };
 
 
+const searchUsers = async (req, res) => {
+  const { query } = req.query;
+  if (!query) return res.status(400).json({ error: "Search query is required" });
+
+  try {
+    const users = await User.find({
+      $or: [
+        { phone: { $regex: query, $options: "i" } },
+        { displayName: { $regex: query, $options: "i" } },
+        { upi_id: { $regex: query, $options: "i" } },
+      ],
+    }).select("displayName phone upi_id profile_photo_url").limit(10);
+
+    res.status(200).json(users);
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Search failed" });
+  }
+};
+
 module.exports = {
   sendOtp,
   verifyOtp,
   createAccount,
   getProfile,
+  searchUsers,
 };
