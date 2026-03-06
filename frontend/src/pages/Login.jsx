@@ -1,6 +1,6 @@
 import { useState, useRef, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
-import { ArrowLeft, Phone, ShieldCheck, Loader2, Globe, Lock, Sparkles } from 'lucide-react';
+import { ArrowLeft, Phone, ShieldCheck, Loader2, Globe, Lock, Sparkles, Users, Zap, CreditCard, Award } from 'lucide-react';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
 
@@ -15,6 +15,16 @@ const COUNTRIES = [
   { code: '+971', name: 'UAE', flag: '\u{1F1E6}\u{1F1EA}', maxLen: 9 },
   { code: '+65', name: 'Singapore', flag: '\u{1F1F8}\u{1F1EC}', maxLen: 8 },
   { code: '+86', name: 'China', flag: '\u{1F1E8}\u{1F1F3}', maxLen: 11 },
+  { code: '+82', name: 'South Korea', flag: '\u{1F1F0}\u{1F1F7}', maxLen: 11 },
+  { code: '+55', name: 'Brazil', flag: '\u{1F1E7}\u{1F1F7}', maxLen: 11 },
+  { code: '+7', name: 'Russia', flag: '\u{1F1F7}\u{1F1FA}', maxLen: 10 },
+  { code: '+27', name: 'South Africa', flag: '\u{1F1FF}\u{1F1E6}', maxLen: 9 },
+  { code: '+234', name: 'Nigeria', flag: '\u{1F1F3}\u{1F1EC}', maxLen: 10 },
+  { code: '+62', name: 'Indonesia', flag: '\u{1F1EE}\u{1F1E9}', maxLen: 12 },
+  { code: '+60', name: 'Malaysia', flag: '\u{1F1F2}\u{1F1FE}', maxLen: 10 },
+  { code: '+66', name: 'Thailand', flag: '\u{1F1F9}\u{1F1ED}', maxLen: 9 },
+  { code: '+39', name: 'Italy', flag: '\u{1F1EE}\u{1F1F9}', maxLen: 10 },
+  { code: '+34', name: 'Spain', flag: '\u{1F1EA}\u{1F1F8}', maxLen: 9 },
 ];
 
 export default function Login() {
@@ -23,6 +33,7 @@ export default function Login() {
   const [phoneNumber, setPhoneNumber] = useState('');
   const [selectedCountry, setSelectedCountry] = useState(COUNTRIES[0]);
   const [showCountryPicker, setShowCountryPicker] = useState(false);
+  const [countrySearch, setCountrySearch] = useState('');
   const [otpSent, setOtpSent] = useState(false);
   const [otp, setOtp] = useState(['', '', '', '', '', '']);
   const [message, setMessage] = useState({ text: '', color: '' });
@@ -31,6 +42,10 @@ export default function Login() {
   const [backendOtp, setBackendOtp] = useState('');
   const [showAutoFillPrompt, setShowAutoFillPrompt] = useState(false);
   const otpRefs = useRef([]);
+
+  const filteredCountries = countrySearch
+    ? COUNTRIES.filter((c) => c.name.toLowerCase().includes(countrySearch.toLowerCase()) || c.code.includes(countrySearch))
+    : COUNTRIES;
 
   useEffect(() => {
     if (countdown > 0) {
@@ -53,10 +68,10 @@ export default function Login() {
         setCountdown(30);
         // Store OTP from backend but don't auto-fill immediately
         setBackendOtp(data.otp.toString());
-        // Show auto-fill prompt after a short delay
+        // Show auto-fill prompt after a 2.5 second delay to simulate real OTP delivery
         setTimeout(() => {
           setShowAutoFillPrompt(true);
-        }, 1500);
+        }, 2500);
       } else {
         setMessage({ text: data.error || 'Failed to send OTP.', color: 'text-red-500' });
       }
@@ -129,19 +144,44 @@ export default function Login() {
   const isOtpComplete = otp.every((d) => d !== '');
 
   return (
-    <div className="min-h-screen gradient-warm flex flex-col items-center px-6 py-6 animate-fadeIn">
+    <div className="min-h-screen gradient-warm flex flex-col items-center px-6 py-6 animate-fadeIn overflow-y-auto">
+      {/* Animated background circles */}
+      <div className="fixed top-0 left-0 w-full h-full pointer-events-none overflow-hidden -z-10">
+        <div className="absolute -top-20 -right-20 w-64 h-64 rounded-full bg-[#f65e1d]/5 animate-float" />
+        <div className="absolute top-1/3 -left-16 w-48 h-48 rounded-full bg-[#ff9800]/5 animate-float-delayed" />
+        <div className="absolute bottom-20 right-10 w-32 h-32 rounded-full bg-[#f65e1d]/5 animate-float" />
+      </div>
+
       {/* Logo */}
       <div className="flex items-center gap-2 mb-2">
-        <img src="/photos/gradious-pay-logo-final.png" alt="Logo" className="w-10 h-10" />
-        <h1 className="text-xl font-bold text-gray-800">
+        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#f65e1d] to-[#ff9800] flex items-center justify-center shadow-lg animate-3d-float">
+          <span className="text-white text-xl font-bold">G</span>
+        </div>
+        <h1 className="text-2xl font-bold text-gray-800">
           <span className="text-[#f65e1d]">Gradious </span>Pay
         </h1>
       </div>
 
       {/* Tagline */}
-      <p className="text-xs text-gray-400 mb-4 flex items-center gap-1">
+      <p className="text-xs text-gray-400 mb-3 flex items-center gap-1">
         <Lock size={12} /> Secure & Fast UPI Payments
       </p>
+
+      {/* Trust Badges */}
+      <div className="flex items-center gap-3 mb-4">
+        <div className="flex items-center gap-1 px-3 py-1.5 bg-white/60 rounded-full shadow-sm">
+          <Users size={12} className="text-[#f65e1d]" />
+          <span className="text-[10px] text-gray-600 font-medium">10M+ Users</span>
+        </div>
+        <div className="flex items-center gap-1 px-3 py-1.5 bg-white/60 rounded-full shadow-sm">
+          <Zap size={12} className="text-green-500" />
+          <span className="text-[10px] text-gray-600 font-medium">Instant Transfer</span>
+        </div>
+        <div className="flex items-center gap-1 px-3 py-1.5 bg-white/60 rounded-full shadow-sm">
+          <Award size={12} className="text-yellow-500" />
+          <span className="text-[10px] text-gray-600 font-medium">Earn Rewards</span>
+        </div>
+      </div>
 
       {/* Card */}
       <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 animate-slideUp">
@@ -154,7 +194,7 @@ export default function Login() {
 
         <h2 className="text-xl font-bold text-gray-700 mb-1">Welcome Back!</h2>
         <p className="text-sm text-gray-400 mb-1">Register or Login to your account</p>
-        <p className="text-xs text-gray-300 mb-5">Join millions of users making instant, secure payments</p>
+        <p className="text-xs text-gray-300 mb-5">Join millions of users making instant, secure payments across the globe</p>
 
         {/* Country Selector */}
         <div className="mb-3">
@@ -173,20 +213,34 @@ export default function Login() {
           </button>
 
           {showCountryPicker && (
-            <div className="mt-1 bg-white rounded-xl shadow-lg border border-gray-100 max-h-48 overflow-y-auto z-10 relative">
-              {COUNTRIES.map((country) => (
-                <button
-                  key={country.code}
-                  onClick={() => { setSelectedCountry(country); setShowCountryPicker(false); setPhoneNumber(''); }}
-                  className={`w-full flex items-center gap-2 px-4 py-2.5 hover:bg-orange-50 transition-colors cursor-pointer border-none text-left ${
-                    selectedCountry.code === country.code ? 'bg-orange-50' : 'bg-transparent'
-                  }`}
-                >
-                  <span className="text-lg">{country.flag}</span>
-                  <span className="text-sm text-gray-700">{country.name}</span>
-                  <span className="text-xs text-gray-400 ml-auto">{country.code}</span>
-                </button>
-              ))}
+            <div className="mt-1 bg-white rounded-xl shadow-lg border border-gray-100 z-10 relative">
+              <div className="p-2 border-b border-gray-100">
+                <input
+                  type="text"
+                  placeholder="Search country..."
+                  value={countrySearch}
+                  onChange={(e) => setCountrySearch(e.target.value)}
+                  className="w-full px-3 py-2 text-sm border border-gray-200 rounded-lg outline-none focus:border-[#f65e1d] bg-gray-50"
+                />
+              </div>
+              <div className="max-h-48 overflow-y-auto">
+                {filteredCountries.map((country) => (
+                  <button
+                    key={country.code}
+                    onClick={() => { setSelectedCountry(country); setShowCountryPicker(false); setPhoneNumber(''); setCountrySearch(''); }}
+                    className={`w-full flex items-center gap-2 px-4 py-2.5 hover:bg-orange-50 transition-colors cursor-pointer border-none text-left ${
+                      selectedCountry.code === country.code ? 'bg-orange-50' : 'bg-transparent'
+                    }`}
+                  >
+                    <span className="text-lg">{country.flag}</span>
+                    <span className="text-sm text-gray-700">{country.name}</span>
+                    <span className="text-xs text-gray-400 ml-auto">{country.code}</span>
+                  </button>
+                ))}
+                {filteredCountries.length === 0 && (
+                  <p className="text-xs text-gray-400 text-center py-3">No countries found</p>
+                )}
+              </div>
             </div>
           )}
         </div>
@@ -210,7 +264,7 @@ export default function Login() {
           <button
             onClick={handleSendOtp}
             disabled={loading || phoneNumber.length < selectedCountry.maxLen - 2}
-            className="w-full py-3 bg-[#f65e1d] hover:bg-[#e5531a] disabled:bg-gray-300 text-white font-semibold rounded-xl shadow-md transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed border-none text-base"
+            className="w-full py-3.5 bg-gradient-to-r from-[#f65e1d] to-[#ff9800] hover:from-[#e5531a] hover:to-[#f08800] disabled:from-gray-300 disabled:to-gray-300 text-white font-semibold rounded-xl shadow-lg hover:shadow-xl transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed border-none text-base transform hover:scale-[1.02] active:scale-[0.98]"
           >
             {loading ? <Loader2 size={18} className="animate-spin" /> : <ShieldCheck size={18} />}
             Send OTP
@@ -219,30 +273,30 @@ export default function Login() {
           <>
             {/* Auto-fill prompt */}
             {showAutoFillPrompt && (
-              <div className="bg-blue-50 border border-blue-200 rounded-xl p-3 mb-4 animate-slideUp">
+              <div className="bg-gradient-to-r from-blue-50 to-indigo-50 border border-blue-200 rounded-xl p-4 mb-4 animate-slideUp shadow-sm">
                 <p className="text-sm text-blue-700 font-medium mb-2 flex items-center gap-1">
-                  <Sparkles size={14} /> OTP received from server
+                  <Sparkles size={14} className="text-blue-500" /> OTP received from server
                 </p>
-                <p className="text-xs text-blue-500 mb-3">Would you like to auto-fill the OTP?</p>
+                <p className="text-xs text-blue-500 mb-3">We received an OTP from the backend. Would you like to auto-enter it?</p>
                 <div className="flex gap-2">
                   <button
                     onClick={handleAutoFillOtp}
-                    className="flex-1 py-2 bg-[#f65e1d] text-white text-sm font-semibold rounded-lg border-none cursor-pointer hover:bg-[#e5531a] transition-colors"
+                    className="flex-1 py-2.5 bg-gradient-to-r from-[#f65e1d] to-[#ff9800] text-white text-sm font-semibold rounded-lg border-none cursor-pointer hover:shadow-md transition-all"
                   >
-                    Yes, Auto-fill
+                    Yes, Auto-enter
                   </button>
                   <button
                     onClick={handleDeclineAutoFill}
-                    className="flex-1 py-2 bg-gray-200 text-gray-600 text-sm font-semibold rounded-lg border-none cursor-pointer hover:bg-gray-300 transition-colors"
+                    className="flex-1 py-2.5 bg-white text-gray-600 text-sm font-semibold rounded-lg border border-gray-200 cursor-pointer hover:bg-gray-50 transition-colors"
                   >
-                    No, Enter Manually
+                    No, I will enter
                   </button>
                 </div>
               </div>
             )}
 
             {/* OTP Inputs */}
-            <div className="flex justify-center gap-2 my-4">
+            <div className="flex justify-center gap-2.5 my-4">
               {otp.map((digit, i) => (
                 <input
                   key={i}
@@ -252,7 +306,8 @@ export default function Login() {
                   value={digit}
                   onChange={(e) => handleOtpChange(i, e.target.value)}
                   onKeyDown={(e) => handleOtpKeyDown(i, e)}
-                  className="w-11 h-13 text-center text-xl font-bold border-2 border-[#f65e1d] rounded-xl bg-white focus:ring-2 focus:ring-[#f65e1d]/30 outline-none transition-all"
+                  className="w-11 h-13 text-center text-xl font-bold border-2 border-gray-200 rounded-xl bg-white focus:border-[#f65e1d] focus:ring-2 focus:ring-[#f65e1d]/20 outline-none transition-all shadow-sm"
+                  style={digit ? { borderColor: '#f65e1d', background: 'linear-gradient(135deg, #fff5ec, #ffffff)' } : {}}
                 />
               ))}
             </div>
@@ -261,7 +316,7 @@ export default function Login() {
             <button
               onClick={handleVerifyOtp}
               disabled={loading || !isOtpComplete}
-              className="w-full py-3 bg-[#f65e1d] hover:bg-[#e5531a] disabled:bg-gray-300 text-white font-semibold rounded-xl shadow-md transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed border-none text-base"
+              className="w-full py-3.5 bg-gradient-to-r from-[#f65e1d] to-[#ff9800] hover:from-[#e5531a] hover:to-[#f08800] disabled:from-gray-300 disabled:to-gray-300 text-white font-semibold rounded-xl shadow-lg transition-all duration-300 flex items-center justify-center gap-2 cursor-pointer disabled:cursor-not-allowed border-none text-base transform hover:scale-[1.02] active:scale-[0.98]"
             >
               {loading ? <Loader2 size={18} className="animate-spin" /> : 'Verify OTP'}
             </button>
@@ -269,7 +324,7 @@ export default function Login() {
             {/* Resend */}
             <div className="text-center mt-3">
               {countdown > 0 ? (
-                <span className="text-sm text-gray-400">Resend OTP in {countdown}s</span>
+                <span className="text-sm text-gray-400">Resend OTP in <span className="text-[#f65e1d] font-semibold">{countdown}s</span></span>
               ) : (
                 <button
                   onClick={handleSendOtp}
@@ -288,8 +343,32 @@ export default function Login() {
         )}
       </div>
 
+      {/* Features Section */}
+      <div className="w-full max-w-sm mt-6 grid grid-cols-2 gap-3">
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm">
+          <CreditCard size={20} className="text-[#f65e1d] mb-2" />
+          <p className="text-xs font-semibold text-gray-700">Multiple Payment Modes</p>
+          <p className="text-[10px] text-gray-400 mt-1">Bank, UPI, Cards & Wallet</p>
+        </div>
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm">
+          <Zap size={20} className="text-green-500 mb-2" />
+          <p className="text-xs font-semibold text-gray-700">Instant Transfers</p>
+          <p className="text-[10px] text-gray-400 mt-1">Send money in seconds</p>
+        </div>
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm">
+          <ShieldCheck size={20} className="text-blue-500 mb-2" />
+          <p className="text-xs font-semibold text-gray-700">Bank Grade Security</p>
+          <p className="text-[10px] text-gray-400 mt-1">256-bit encryption always</p>
+        </div>
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm">
+          <Award size={20} className="text-yellow-500 mb-2" />
+          <p className="text-xs font-semibold text-gray-700">Earn Rewards</p>
+          <p className="text-[10px] text-gray-400 mt-1">Get points on every transaction</p>
+        </div>
+      </div>
+
       {/* Bottom Info */}
-      <div className="mt-6 text-center">
+      <div className="mt-6 text-center pb-6">
         <p className="text-xs text-gray-400">By continuing, you agree to our</p>
         <p className="text-xs text-[#f65e1d] font-medium">Terms of Service & Privacy Policy</p>
         <div className="flex items-center justify-center gap-4 mt-4">
@@ -300,6 +379,7 @@ export default function Login() {
             <ShieldCheck size={10} /> RBI Compliant
           </div>
         </div>
+        <p className="text-[10px] text-gray-300 mt-3">Available in 20+ countries worldwide</p>
       </div>
     </div>
   );

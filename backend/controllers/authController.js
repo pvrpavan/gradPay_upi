@@ -392,16 +392,18 @@ const seedData = async (req, res) => {
     // Add sample transactions
     const Transaction = require("../models/Transaction");
     const sampleTransactions = [
-      { sender_upi: "rahul.3210@gradpay", receiver_upi: "priya.3211@gradpay", amount: 500, type: "debit", note: "Lunch split", timestamp: new Date(Date.now() - 86400000) },
-      { sender_upi: "rahul.3210@gradpay", receiver_upi: "priya.3211@gradpay", amount: 500, type: "credit", note: "Lunch split", timestamp: new Date(Date.now() - 86400000) },
-      { sender_upi: "priya.3211@gradpay", receiver_upi: "amit.3212@gradpay", amount: 1200, type: "debit", note: "Shopping", timestamp: new Date(Date.now() - 172800000) },
-      { sender_upi: "priya.3211@gradpay", receiver_upi: "amit.3212@gradpay", amount: 1200, type: "credit", note: "Shopping", timestamp: new Date(Date.now() - 172800000) },
-      { sender_upi: "amit.3212@gradpay", receiver_upi: "sneha.3213@gradpay", amount: 2000, type: "debit", note: "Birthday gift", timestamp: new Date(Date.now() - 259200000) },
-      { sender_upi: "amit.3212@gradpay", receiver_upi: "sneha.3213@gradpay", amount: 2000, type: "credit", note: "Birthday gift", timestamp: new Date(Date.now() - 259200000) },
-      { sender_upi: "vikram.3214@gradpay", receiver_upi: "rahul.3210@gradpay", amount: 3500, type: "debit", note: "Freelance payment", timestamp: new Date(Date.now() - 345600000) },
-      { sender_upi: "vikram.3214@gradpay", receiver_upi: "rahul.3210@gradpay", amount: 3500, type: "credit", note: "Freelance payment", timestamp: new Date(Date.now() - 345600000) },
-      { sender_upi: "sneha.3213@gradpay", receiver_upi: "vikram.3214@gradpay", amount: 750, type: "debit", note: "Movie tickets", timestamp: new Date(Date.now() - 432000000) },
-      { sender_upi: "sneha.3213@gradpay", receiver_upi: "vikram.3214@gradpay", amount: 750, type: "credit", note: "Movie tickets", timestamp: new Date(Date.now() - 432000000) },
+      { sender_upi: "rahul.3210@gradpay", receiver_upi: "priya.3211@gradpay", amount: 500, type: "transfer", note: "Lunch split", timestamp: new Date(Date.now() - 86400000) },
+      { sender_upi: "priya.3211@gradpay", receiver_upi: "amit.3212@gradpay", amount: 1200, type: "transfer", note: "Shopping", timestamp: new Date(Date.now() - 172800000) },
+      { sender_upi: "amit.3212@gradpay", receiver_upi: "sneha.3213@gradpay", amount: 2000, type: "transfer", note: "Birthday gift", timestamp: new Date(Date.now() - 259200000) },
+      { sender_upi: "vikram.3214@gradpay", receiver_upi: "rahul.3210@gradpay", amount: 3500, type: "transfer", note: "Freelance payment", timestamp: new Date(Date.now() - 345600000) },
+      { sender_upi: "sneha.3213@gradpay", receiver_upi: "vikram.3214@gradpay", amount: 750, type: "transfer", note: "Movie tickets", timestamp: new Date(Date.now() - 432000000) },
+      { sender_upi: "BANK_DEPOSIT", receiver_upi: "rahul.3210@gradpay", amount: 10000, type: "deposit", note: "Wallet deposit", timestamp: new Date(Date.now() - 500000000) },
+      { sender_upi: "BANK_DEPOSIT", receiver_upi: "priya.3211@gradpay", amount: 5000, type: "deposit", note: "Wallet deposit", timestamp: new Date(Date.now() - 550000000) },
+      { sender_upi: "rahul.3210@gradpay", receiver_upi: "vikram.3214@gradpay", amount: 1500, type: "transfer", note: "Dinner payment", timestamp: new Date(Date.now() - 600000000) },
+      { sender_upi: "sneha.3213@gradpay", receiver_upi: "priya.3211@gradpay", amount: 300, type: "transfer", note: "Coffee", timestamp: new Date(Date.now() - 650000000) },
+      { sender_upi: "vikram.3214@gradpay", receiver_upi: "amit.3212@gradpay", amount: 4500, type: "transfer", note: "Project payment", timestamp: new Date(Date.now() - 700000000) },
+      { sender_upi: "rahul.3210@gradpay", receiver_upi: "ELECTRICITY_BILL", amount: 1200, type: "transfer", note: "Electricity bill payment", timestamp: new Date(Date.now() - 750000000) },
+      { sender_upi: "priya.3211@gradpay", receiver_upi: "RECHARGE_BILL", amount: 499, type: "transfer", note: "Recharge bill payment", timestamp: new Date(Date.now() - 800000000) },
     ];
 
     await Transaction.insertMany(sampleTransactions);
