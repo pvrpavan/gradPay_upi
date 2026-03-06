@@ -13,6 +13,8 @@ import Scanner from './pages/Scanner';
 import Chat from './pages/Chat';
 import FAQs from './pages/FAQs';
 import Deposit from './pages/Deposit';
+import Settings from './pages/Settings';
+import Referral from './pages/Referral';
 
 function ProtectedRoute({ children }) {
   const { phone, loading } = useAuth();
@@ -43,6 +45,8 @@ function AppRoutes() {
       <Route path="/chat" element={<ProtectedRoute><Chat /></ProtectedRoute>} />
       <Route path="/faqs" element={<FAQs />} />
       <Route path="/deposit" element={<ProtectedRoute><Deposit /></ProtectedRoute>} />
+      <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
+      <Route path="/referral" element={<ProtectedRoute><Referral /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
