@@ -2,7 +2,7 @@
 const User = require("../models/User");
 const Transaction = require("../models/Transaction");
 
-// POST /api/transactions/send
+// POST /api/transactions/transfer
 exports.transferMoney = async (req, res) => {
   try {
     const { sender_upi, receiver_upi, amount, note } = req.body;
@@ -29,30 +29,24 @@ exports.transferMoney = async (req, res) => {
     await sender.save();
     await receiver.save();
 
-    // Save two transaction records: one debit, one credit
-    const debitTransaction = new Transaction({
+    // Save a SINGLE transaction record (not two!) to prevent duplicates
+    const transaction = new Transaction({
       sender_upi,
       receiver_upi,
       amount,
-      type: "debit",
+      type: "transfer",
       note: note || "Money sent",
     });
 
-    const creditTransaction = new Transaction({
-      sender_upi,
-      receiver_upi,
-      amount,
-      type: "credit",
-      note: note || "Money received",
-    });
+    await transaction.save();
 
-    await debitTransaction.save();
-    await creditTransaction.save();
+    // Add reward points for transaction
+    sender.rewardPoints = (sender.rewardPoints || 0) + Math.floor(amount / 100);
+    await sender.save();
 
     res.status(200).json({
       message: "Transaction successful",
-      debitTransaction,
-      creditTransaction,
+      transaction,
     });
   } catch (err) {
     console.error("Send Money Error:", err);
@@ -60,19 +54,71 @@ exports.transferMoney = async (req, res) => {
   }
 };
 
+// Deposit money
+exports.depositMoney = async (req, res) => {
+  try {
+    const { phone, amount } = req.body;
+
+    if (!phone || !amount || amount <= 0) {
+      return res.status(400).json({ message: "Invalid deposit data" });
+    }
+
+    const user = await User.findOne({ phone });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    user.balance += amount;
+    await user.save();
+
+    const upiId = Array.isArray(user.upi_id) ? user.upi_id[0] : user.upi_id;
+
+    const transaction = new Transaction({
+      sender_upi: "BANK_DEPOSIT",
+      receiver_upi: upiId,
+      amount,
+      type: "deposit",
+      note: "Wallet deposit",
+    });
+
+    await transaction.save();
+
+    console.log(`Deposit: ${phone} deposited ₹${amount}`);
+
+    res.status(200).json({
+      message: "Deposit successful",
+      balance: user.balance,
+      transaction,
+    });
+  } catch (err) {
+    console.error("Deposit Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
 exports.getTransactionHistory = async (req, res) => {
   try {
     const { upi_id } = req.params;
-    const { type, from, to, page = 1, limit = 10 } = req.query;
+    const { type, from, to, page = 1, limit = 20 } = req.query;
 
+    // Find transactions where user is sender OR receiver (single record per tx)
     const query = {
       $or: [{ sender_upi: upi_id }, { receiver_upi: upi_id }],
     };
 
     // Filter by type
-    if (type === "credit" || type === "debit") {
-      query.type = type;
+    if (type === "sent") {
+      query.$or = undefined;
+      query.sender_upi = upi_id;
+      query.type = "transfer";
+    } else if (type === "received") {
+      query.$or = undefined;
+      query.receiver_upi = upi_id;
+      query.type = "transfer";
+    } else if (type === "deposit") {
+      query.$or = undefined;
+      query.receiver_upi = upi_id;
+      query.type = "deposit";
     }
+    // "all" keeps the default $or
 
     // Filter by date range
     if (from || to) {
@@ -103,8 +149,6 @@ exports.getTransactionHistory = async (req, res) => {
   }
 };
 
-
-
 exports.getTransactionById = async (req, res) => {
   try {
     const { id } = req.params;
@@ -114,14 +158,22 @@ exports.getTransactionById = async (req, res) => {
       return res.status(404).json({ message: "Transaction not found" });
     }
 
-    res.status(200).json(transaction);
+    // Enrich with user details
+    const sender = await User.findOne({ upi_id: transaction.sender_upi });
+    const receiver = await User.findOne({ upi_id: transaction.receiver_upi });
+
+    res.status(200).json({
+      ...transaction.toObject(),
+      senderName: sender?.displayName || "Unknown",
+      receiverName: receiver?.displayName || "Unknown",
+      senderPhone: sender?.phone || "",
+      receiverPhone: receiver?.phone || "",
+    });
   } catch (error) {
     console.error("Error fetching transaction by ID:", error);
     res.status(500).json({ message: "Error fetching transaction" });
   }
 };
-
-
 
 
 
