@@ -15,6 +15,7 @@ import FAQs from './pages/FAQs';
 import Deposit from './pages/Deposit';
 import Settings from './pages/Settings';
 import Referral from './pages/Referral';
+import UtilityPayment from './pages/UtilityPayment';
 
 function ProtectedRoute({ children }) {
   const { phone, loading } = useAuth();
@@ -47,6 +48,7 @@ function AppRoutes() {
       <Route path="/deposit" element={<ProtectedRoute><Deposit /></ProtectedRoute>} />
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/referral" element={<ProtectedRoute><Referral /></ProtectedRoute>} />
+      <Route path="/utility" element={<ProtectedRoute><UtilityPayment /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );

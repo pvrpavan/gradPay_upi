@@ -54,26 +54,32 @@ exports.transferMoney = async (req, res) => {
   }
 };
 
-// Deposit money
+// Deposit money - accepts both phone and upi_id
 exports.depositMoney = async (req, res) => {
   try {
-    const { phone, amount } = req.body;
+    const { phone, upi_id, amount } = req.body;
 
-    if (!phone || !amount || amount <= 0) {
+    if ((!phone && !upi_id) || !amount || amount <= 0) {
       return res.status(400).json({ message: "Invalid deposit data" });
     }
 
-    const user = await User.findOne({ phone });
+    let user;
+    if (upi_id) {
+      user = await User.findOne({ upi_id: upi_id });
+    }
+    if (!user && phone) {
+      user = await User.findOne({ phone });
+    }
     if (!user) return res.status(404).json({ message: "User not found" });
 
     user.balance += amount;
     await user.save();
 
-    const upiId = Array.isArray(user.upi_id) ? user.upi_id[0] : user.upi_id;
+    const userUpiId = Array.isArray(user.upi_id) ? user.upi_id[0] : user.upi_id;
 
     const transaction = new Transaction({
       sender_upi: "BANK_DEPOSIT",
-      receiver_upi: upiId,
+      receiver_upi: userUpiId,
       amount,
       type: "deposit",
       note: "Wallet deposit",
@@ -81,7 +87,7 @@ exports.depositMoney = async (req, res) => {
 
     await transaction.save();
 
-    console.log(`Deposit: ${phone} deposited ₹${amount}`);
+    console.log(`Deposit: ${user.phone} deposited Rs.${amount}`);
 
     res.status(200).json({
       message: "Deposit successful",
@@ -90,6 +96,54 @@ exports.depositMoney = async (req, res) => {
     });
   } catch (err) {
     console.error("Deposit Error:", err);
+    res.status(500).json({ message: "Internal server error" });
+  }
+};
+
+// Utility bill payment
+exports.payUtilityBill = async (req, res) => {
+  try {
+    const { phone, utilityType, amount, billNumber } = req.body;
+
+    if (!phone || !utilityType || !amount || amount <= 0) {
+      return res.status(400).json({ message: "Invalid utility payment data" });
+    }
+
+    const user = await User.findOne({ phone });
+    if (!user) return res.status(404).json({ message: "User not found" });
+
+    if (user.balance < amount) {
+      return res.status(400).json({ message: "Insufficient balance" });
+    }
+
+    user.balance -= amount;
+    await user.save();
+
+    const userUpiId = Array.isArray(user.upi_id) ? user.upi_id[0] : user.upi_id;
+
+    const transaction = new Transaction({
+      sender_upi: userUpiId,
+      receiver_upi: `${utilityType.toUpperCase()}_BILL`,
+      amount,
+      type: "transfer",
+      note: `${utilityType} bill payment${billNumber ? ` - ${billNumber}` : ""}`,
+    });
+
+    await transaction.save();
+
+    // Add reward points
+    user.rewardPoints = (user.rewardPoints || 0) + Math.floor(amount / 50);
+    await user.save();
+
+    console.log(`Utility: ${user.phone} paid Rs.${amount} for ${utilityType}`);
+
+    res.status(200).json({
+      message: "Bill payment successful",
+      balance: user.balance,
+      transaction,
+    });
+  } catch (err) {
+    console.error("Utility Payment Error:", err);
     res.status(500).json({ message: "Internal server error" });
   }
 };
@@ -164,8 +218,8 @@ exports.getTransactionById = async (req, res) => {
 
     res.status(200).json({
       ...transaction.toObject(),
-      senderName: sender?.displayName || "Unknown",
-      receiverName: receiver?.displayName || "Unknown",
+      senderName: sender?.displayName || transaction.sender_upi,
+      receiverName: receiver?.displayName || transaction.receiver_upi,
       senderPhone: sender?.phone || "",
       receiverPhone: receiver?.phone || "",
     });
@@ -174,97 +228,3 @@ exports.getTransactionById = async (req, res) => {
     res.status(500).json({ message: "Error fetching transaction" });
   }
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-// // controllers/transactionController.js
-// const User = require("../models/User");
-// const Transaction = require("../models/Transaction");
-
-// // POST /api/transactions/send
-// exports.transferMoney = async (req, res) => {
-//   try {
-//     const { sender_upi, receiver_upi, amount, note } = req.body;
-
-//     if (!sender_upi || !receiver_upi || !amount || amount <= 0) {
-//       return res.status(400).json({ message: "Invalid transaction data" });
-//     }
-
-//     // Find sender and receiver
-//     const sender = await User.findOne({ upi_id: sender_upi });
-//     const receiver = await User.findOne({ upi_id: receiver_upi });
-
-//     if (!sender || !receiver) {
-//       return res.status(404).json({ message: "Sender or receiver not found" });
-//     }
-
-//     // Check sender balance
-//     if (sender.balance < amount) {
-//       return res.status(400).json({ message: "Insufficient balance" });
-//     }
-
-//     // Deduct from sender, add to receiver
-//     sender.balance -= amount;
-//     receiver.balance += amount;
-//     await sender.save();
-//     await receiver.save();
-
-//     // Log transaction (single record with type: "debit")
-//     const transaction = new Transaction({
-//       sender_upi,
-//       receiver_upi,
-//       amount,
-//       type: "debit",
-//       note: note || "Money sent",
-//     });
-//     await transaction.save();
-
-//     res.status(200).json({
-//       message: "Transaction successful",
-//       transaction,
-//     });
-//   } catch (err) {
-//     console.error("Send Money Error:", err);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };
-
-// // GET /api/transactions/:upi_id
-// exports.getTransactionHistory = async (req, res) => {
-//   try {
-//     const { upi_id } = req.params;
-
-//     const transactions = await Transaction.find({
-//       $or: [{ sender_upi: upi_id }, { receiver_upi: upi_id }],
-//     }).sort({ timestamp: -1 });
-
-//     res.status(200).json(transactions);
-//   } catch (err) {
-//     console.error("Get Transactions Error:", err);
-//     res.status(500).json({ message: "Internal server error" });
-//   }
-// };

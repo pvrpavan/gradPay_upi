@@ -59,14 +59,8 @@ export function AuthProvider({ children }) {
     localStorage.removeItem('phone');
     localStorage.removeItem('token');
     localStorage.clear();
-    // Push a clean state so back button doesn't go to protected pages
-    window.history.pushState(null, '', '/login');
-    window.addEventListener('popstate', function handlePop() {
-      if (!localStorage.getItem('phone')) {
-        window.history.pushState(null, '', '/login');
-      }
-      window.removeEventListener('popstate', handlePop);
-    });
+    // Replace entire history so back button cannot go to protected pages
+    window.location.replace('/login');
   };
 
   return (

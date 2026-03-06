@@ -98,6 +98,14 @@ export const api = {
   getTransactionById: (id) =>
     fetch(`${API_BASE}/transactions/id/${id}`).then((r) => r.json()),
 
+  // Utility bill payment
+  payUtilityBill: (payload) =>
+    fetch(`${API_BASE}/transactions/utility`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(payload),
+    }).then((r) => r.json()),
+
   // Expenses
   addExpense: (payload) =>
     fetch(`${API_BASE}/tracker`, {
