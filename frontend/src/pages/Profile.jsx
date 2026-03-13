@@ -3,7 +3,7 @@ import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
 import { api } from '../utils/api';
-import { ArrowLeft, Star, Gift, Settings, Info, LogOut, QrCode, Copy, Check, Camera, Edit3, User, Mail, MapPin, Briefcase, Calendar, ChevronRight, Loader2 } from 'lucide-react';
+import { ArrowLeft, Star, Gift, Settings, Info, LogOut, QrCode, Copy, Check, Camera, Edit3, User, Mail, MapPin, Briefcase, Calendar, ChevronRight, Loader2, Lock, KeyRound } from 'lucide-react';
 import Avatar from '../components/Avatar';
 
 function QrModal({ upiId, onClose, theme }) {
@@ -55,6 +55,10 @@ export default function Profile() {
   const [editForm, setEditForm] = useState({ displayName: '', email: '', dob: '', gender: '', address: '', occupation: '' });
   const [editLoading, setEditLoading] = useState(false);
   const [showPhotoPicker, setShowPhotoPicker] = useState(false);
+  const [showChangePin, setShowChangePin] = useState(false);
+  const [pinForm, setPinForm] = useState({ oldPin: '', newPin: '', confirmPin: '' });
+  const [pinMsg, setPinMsg] = useState({ text: '', isError: false });
+  const [pinLoading, setPinLoading] = useState(false);
 
   useEffect(() => {
     if (!phone) {
@@ -113,6 +117,40 @@ export default function Profile() {
       }
     } catch { /* ignore */ }
     setEditLoading(false);
+  };
+
+  const handleChangeUpiPin = async () => {
+    const { oldPin, newPin, confirmPin } = pinForm;
+    if (!oldPin || !newPin || !confirmPin) {
+      setPinMsg({ text: 'All fields are required', isError: true });
+      return;
+    }
+    if (newPin.length < 4 || newPin.length > 6) {
+      setPinMsg({ text: 'New PIN must be 4-6 digits', isError: true });
+      return;
+    }
+    if (newPin !== confirmPin) {
+      setPinMsg({ text: 'New PIN and confirm PIN do not match', isError: true });
+      return;
+    }
+    setPinLoading(true);
+    setPinMsg({ text: '', isError: false });
+    try {
+      const data = await api.changeUpiPin(phone, oldPin, newPin);
+      if (data.error) {
+        setPinMsg({ text: data.error, isError: true });
+      } else {
+        setPinMsg({ text: 'UPI PIN changed successfully!', isError: false });
+        setTimeout(() => {
+          setShowChangePin(false);
+          setPinForm({ oldPin: '', newPin: '', confirmPin: '' });
+          setPinMsg({ text: '', isError: false });
+        }, 1500);
+      }
+    } catch {
+      setPinMsg({ text: 'Failed to change UPI PIN', isError: true });
+    }
+    setPinLoading(false);
   };
 
   const handleChangePhoto = async (photoUrl) => {
@@ -346,6 +384,7 @@ export default function Profile() {
       {/* Menu Items */}
       <div className="flex flex-col gap-3">
         {[
+          { icon: KeyRound, label: 'Change UPI PIN', onClick: () => setShowChangePin(true) },
           { icon: Gift, label: 'Referral Program', onClick: () => navigate('/referral') },
           { icon: Settings, label: 'Settings', onClick: () => navigate('/settings') },
           { icon: Info, label: 'About GradPay', onClick: () => navigate('/faqs') },
@@ -377,6 +416,79 @@ export default function Profile() {
           <ChevronRight size={18} className="text-red-400" />
         </button>
       </div>
+
+      {/* Change UPI PIN Modal */}
+      {showChangePin && (
+        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4" onClick={() => { setShowChangePin(false); setPinForm({ oldPin: '', newPin: '', confirmPin: '' }); setPinMsg({ text: '', isError: false }); }}>
+          <div className="rounded-2xl p-6 w-full max-w-sm animate-slideUp" style={{ backgroundColor: theme.bgCard }} onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold mb-1 flex items-center gap-2" style={{ color: theme.text }}>
+              <Lock size={20} style={{ color: theme.brand }} /> Change UPI PIN
+            </h3>
+            <p className="text-xs mb-4" style={{ color: theme.textMuted }}>Enter your current PIN and set a new one</p>
+
+            <div className="space-y-3">
+              <div>
+                <label className="text-xs font-medium mb-1 block" style={{ color: theme.textSecondary }}>Current PIN</label>
+                <input
+                  type="password"
+                  maxLength={6}
+                  value={pinForm.oldPin}
+                  onChange={(e) => setPinForm({ ...pinForm, oldPin: e.target.value.replace(/\D/g, '') })}
+                  placeholder="Enter current PIN"
+                  className="w-full px-4 py-3 text-center text-xl tracking-widest border-2 rounded-xl outline-none"
+                  style={{ backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.border }}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium mb-1 block" style={{ color: theme.textSecondary }}>New PIN (4-6 digits)</label>
+                <input
+                  type="password"
+                  maxLength={6}
+                  value={pinForm.newPin}
+                  onChange={(e) => setPinForm({ ...pinForm, newPin: e.target.value.replace(/\D/g, '') })}
+                  placeholder="Enter new PIN"
+                  className="w-full px-4 py-3 text-center text-xl tracking-widest border-2 rounded-xl outline-none"
+                  style={{ backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.border }}
+                />
+              </div>
+              <div>
+                <label className="text-xs font-medium mb-1 block" style={{ color: theme.textSecondary }}>Confirm New PIN</label>
+                <input
+                  type="password"
+                  maxLength={6}
+                  value={pinForm.confirmPin}
+                  onChange={(e) => setPinForm({ ...pinForm, confirmPin: e.target.value.replace(/\D/g, '') })}
+                  placeholder="Confirm new PIN"
+                  className="w-full px-4 py-3 text-center text-xl tracking-widest border-2 rounded-xl outline-none"
+                  style={{ backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.border }}
+                />
+              </div>
+            </div>
+
+            {pinMsg.text && (
+              <p className={`text-xs text-center mt-3 font-medium ${pinMsg.isError ? 'text-red-500' : 'text-green-500'}`}>{pinMsg.text}</p>
+            )}
+
+            <div className="flex gap-2 mt-4">
+              <button
+                onClick={() => { setShowChangePin(false); setPinForm({ oldPin: '', newPin: '', confirmPin: '' }); setPinMsg({ text: '', isError: false }); }}
+                className="flex-1 py-2.5 rounded-xl border-none cursor-pointer text-sm font-medium"
+                style={{ backgroundColor: theme.inputBg, color: theme.textSecondary }}
+              >
+                Cancel
+              </button>
+              <button
+                onClick={handleChangeUpiPin}
+                disabled={pinLoading}
+                className="flex-1 py-2.5 text-white rounded-xl border-none cursor-pointer text-sm font-medium disabled:opacity-60"
+                style={{ backgroundColor: theme.brand }}
+              >
+                {pinLoading ? 'Changing...' : 'Change PIN'}
+              </button>
+            </div>
+          </div>
+        </div>
+      )}
     </div>
   );
 }

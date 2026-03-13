@@ -67,6 +67,13 @@ export const api = {
       body: JSON.stringify({ phone, upiPin }),
     }).then((r) => r.json()),
 
+  changeUpiPin: (phone, oldPin, newPin) =>
+    fetch(`${API_BASE}/auth/change-upi-pin`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ phone, oldPin, newPin }),
+    }).then((r) => r.json()),
+
   getAllUsers: (excludePhone) =>
     fetch(`${API_BASE}/auth/users?exclude=${encodeURIComponent(excludePhone || '')}`).then((r) => r.json()),
 
