@@ -1,10 +1,12 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { api } from '../utils/api';
 import { ArrowLeft, Star, Gift, Settings, Info, LogOut, QrCode, Copy, Check, Camera, Edit3, User, Mail, MapPin, Briefcase, Calendar, ChevronRight, Loader2 } from 'lucide-react';
+import Avatar from '../components/Avatar';
 
-function QrModal({ upiId, onClose }) {
+function QrModal({ upiId, onClose, theme }) {
   const [qrData, setQrData] = useState(null);
   const [loading, setLoading] = useState(true);
 
@@ -19,22 +21,22 @@ function QrModal({ upiId, onClose }) {
 
   return (
     <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4" onClick={onClose}>
-      <div className="bg-white rounded-2xl p-6 text-center w-full max-w-xs animate-bounce-in" onClick={(e) => e.stopPropagation()}>
-        <h3 className="text-lg font-bold text-gray-800 mb-3">Your QR Code</h3>
+      <div className="rounded-2xl p-6 text-center w-full max-w-xs animate-bounce-in" style={{ backgroundColor: theme.bgCard }} onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-lg font-bold mb-3" style={{ color: theme.text }}>Your QR Code</h3>
         {loading ? (
           <div className="w-48 h-48 mx-auto flex items-center justify-center">
-            <Loader2 size={32} className="text-[#f65e1d] animate-spin" />
+            <Loader2 size={32} className="animate-spin" style={{ color: theme.brand }} />
           </div>
         ) : qrData?.qrCode ? (
           <img src={qrData.qrCode} alt="QR Code" className="w-48 h-48 mx-auto rounded-xl" />
         ) : (
-          <div className="w-48 h-48 mx-auto bg-gray-100 rounded-xl flex flex-col items-center justify-center gap-2">
-            <QrCode size={48} className="text-gray-300" />
-            <p className="text-xs text-gray-400">QR not available</p>
+          <div className="w-48 h-48 mx-auto rounded-xl flex flex-col items-center justify-center gap-2" style={{ backgroundColor: theme.inputBg }}>
+            <QrCode size={48} style={{ color: theme.textMuted }} />
+            <p className="text-xs" style={{ color: theme.textMuted }}>QR not available</p>
           </div>
         )}
-        <p className="text-xs text-gray-400 mt-3">Scan to pay {upiId}</p>
-        <button onClick={onClose} className="mt-4 px-6 py-2 bg-[#f65e1d] text-white rounded-xl border-none cursor-pointer text-sm font-medium">Close</button>
+        <p className="text-xs mt-3" style={{ color: theme.textMuted }}>Scan to pay {upiId}</p>
+        <button onClick={onClose} className="mt-4 px-6 py-2 text-white rounded-xl border-none cursor-pointer text-sm font-medium" style={{ backgroundColor: theme.brand }}>Close</button>
       </div>
     </div>
   );
@@ -43,6 +45,7 @@ function QrModal({ upiId, onClose }) {
 export default function Profile() {
   const navigate = useNavigate();
   const { phone, logout, user, setUser } = useAuth();
+  const { theme } = useTheme();
   const [profile, setProfile] = useState(null);
   const [referralCode, setReferralCode] = useState('');
   const [copied, setCopied] = useState(false);
@@ -51,10 +54,6 @@ export default function Profile() {
   const [showEditProfile, setShowEditProfile] = useState(false);
   const [editForm, setEditForm] = useState({ displayName: '', email: '', dob: '', gender: '', address: '', occupation: '' });
   const [editLoading, setEditLoading] = useState(false);
-  const [profilePhotos] = useState([
-    '/photos/avatar1.png', '/photos/avatar2.png', '/photos/avatar3.png',
-    '/photos/avatar4.png', '/photos/avatar5.png', '/photos/avatar6.png',
-  ]);
   const [showPhotoPicker, setShowPhotoPicker] = useState(false);
 
   useEffect(() => {
@@ -128,86 +127,93 @@ export default function Profile() {
 
   if (!profile) {
     return (
-      <div className="min-h-screen gradient-warm flex items-center justify-center">
-        <div className="animate-spin w-8 h-8 border-3 border-[#f65e1d] border-t-transparent rounded-full" />
+      <div className="min-h-screen flex items-center justify-center" style={{ background: `linear-gradient(135deg, ${theme.gradientFrom}, ${theme.gradientTo})` }}>
+        <div className="animate-spin w-8 h-8 border-3 rounded-full" style={{ borderColor: theme.brand, borderTopColor: 'transparent' }} />
       </div>
     );
   }
 
   const displayName = profile.name || profile.displayName || 'User';
   const upiIds = Array.isArray(profile.upi_id) ? profile.upi_id : [profile.upi_id].filter(Boolean);
-  const profilePhotoSrc = profile.profile_photo_url || '/photos/my-profile.png';
+  const profilePhotoSrc = profile.profile_photo_url || '';
 
   return (
-    <div className="min-h-screen gradient-warm px-4 py-4 animate-fadeIn pb-8">
+    <div className="min-h-screen px-4 py-4 animate-fadeIn pb-8" style={{ background: `linear-gradient(135deg, ${theme.gradientFrom}, ${theme.gradientTo})` }}>
       {/* Header */}
-      <div className="flex items-center justify-between p-4 bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl shadow-md mb-4">
+      <div className="flex items-center justify-between p-4 rounded-2xl shadow-md mb-4" style={{ backgroundColor: theme.bgCard, border: `1px solid ${theme.border}` }}>
         <div className="flex items-center gap-3">
-          <button onClick={() => navigate('/dashboard')} className="bg-transparent border-none cursor-pointer text-[#f65e1d]">
+          <button onClick={() => navigate('/dashboard')} className="bg-transparent border-none cursor-pointer" style={{ color: theme.brand }}>
             <ArrowLeft size={22} />
           </button>
           <div className="relative">
-            <img src={profilePhotoSrc} alt="Profile" className="w-12 h-12 rounded-full border-2 border-[#f65e1d] shadow-md object-cover" />
+            <Avatar name={displayName} photoUrl={profilePhotoSrc} size={48} />
             <button
               onClick={() => setShowPhotoPicker(true)}
-              className="absolute -bottom-1 -right-1 w-6 h-6 bg-[#f65e1d] rounded-full flex items-center justify-center border-2 border-white cursor-pointer"
+              className="absolute -bottom-1 -right-1 w-6 h-6 rounded-full flex items-center justify-center border-2 border-white cursor-pointer"
+              style={{ backgroundColor: theme.brand }}
             >
               <Camera size={10} className="text-white" />
             </button>
           </div>
           <div>
-            <p className="text-xs text-gray-400">Welcome back,</p>
-            <h3 className="text-lg font-bold text-[#f65e1d]">{displayName}</h3>
-            <span className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] bg-gradient-to-r from-orange-400 to-orange-500 text-white rounded-full mt-1">
+            <p className="text-xs" style={{ color: theme.textMuted }}>Welcome back,</p>
+            <h3 className="text-lg font-bold" style={{ color: theme.brand }}>{displayName}</h3>
+            <span
+              className="inline-flex items-center gap-1 px-2 py-0.5 text-[10px] text-white rounded-full mt-1"
+              style={{ background: `linear-gradient(135deg, ${theme.brand}, ${theme.brandLight})` }}
+            >
               <Star size={10} /> {profile.profileCompleted ? 'Verified User' : 'Complete Profile'}
             </span>
           </div>
         </div>
         <button
           onClick={() => setShowQr(true)}
-          className="w-10 h-10 border-2 border-[#f65e1d] rounded-full flex items-center justify-center bg-white cursor-pointer"
+          className="w-10 h-10 border-2 rounded-full flex items-center justify-center cursor-pointer"
+          style={{ borderColor: theme.brand, backgroundColor: theme.bgCard }}
         >
-          <QrCode size={18} className="text-[#f65e1d]" />
+          <QrCode size={18} style={{ color: theme.brand }} />
         </button>
       </div>
 
       {/* Photo Picker Modal */}
       {showPhotoPicker && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4" onClick={() => setShowPhotoPicker(false)}>
-          <div className="bg-white rounded-2xl p-5 w-full max-w-sm animate-slideUp" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Choose Profile Photo</h3>
+          <div className="rounded-2xl p-5 w-full max-w-sm animate-slideUp" style={{ backgroundColor: theme.bgCard }} onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold mb-4" style={{ color: theme.text }}>Choose Avatar Style</h3>
             <div className="grid grid-cols-3 gap-3">
-              {profilePhotos.map((photo, i) => (
+              {['Alice Johnson', 'Bob Smith', 'Charlie Dev', 'Diana K', 'Eva M', 'Frank W'].map((name, i) => (
                 <button
                   key={i}
-                  onClick={() => handleChangePhoto(photo)}
-                  className="w-full aspect-square rounded-xl border-2 border-gray-200 hover:border-[#f65e1d] transition-colors cursor-pointer overflow-hidden bg-orange-50 flex items-center justify-center"
+                  onClick={() => handleChangePhoto(`avatar:${name}`)}
+                  className="w-full aspect-square rounded-xl border-2 transition-colors cursor-pointer overflow-hidden flex items-center justify-center"
+                  style={{ borderColor: theme.border, backgroundColor: theme.inputBg }}
                 >
-                  <User size={32} className="text-[#f65e1d]" />
+                  <Avatar name={name} size={48} />
                 </button>
               ))}
               <button
                 onClick={() => handleChangePhoto('')}
-                className="w-full aspect-square rounded-xl border-2 border-dashed border-gray-300 hover:border-[#f65e1d] transition-colors cursor-pointer flex items-center justify-center bg-gray-50"
+                className="w-full aspect-square rounded-xl border-2 border-dashed transition-colors cursor-pointer flex items-center justify-center"
+                style={{ borderColor: theme.textMuted, backgroundColor: theme.inputBg }}
               >
-                <span className="text-xs text-gray-400">Default</span>
+                <span className="text-xs" style={{ color: theme.textMuted }}>Auto</span>
               </button>
             </div>
-            <button onClick={() => setShowPhotoPicker(false)} className="w-full mt-4 py-2 bg-gray-100 text-gray-600 rounded-xl border-none cursor-pointer text-sm font-medium">Cancel</button>
+            <button onClick={() => setShowPhotoPicker(false)} className="w-full mt-4 py-2 rounded-xl border-none cursor-pointer text-sm font-medium" style={{ backgroundColor: theme.inputBg, color: theme.textSecondary }}>Cancel</button>
           </div>
         </div>
       )}
 
       {/* QR Code Modal */}
       {showQr && (
-        <QrModal upiId={upiIds[0]} onClose={() => setShowQr(false)} />
+        <QrModal upiId={upiIds[0]} onClose={() => setShowQr(false)} theme={theme} />
       )}
 
       {/* Edit Profile Modal */}
       {showEditProfile && (
         <div className="fixed inset-0 bg-black/50 z-50 flex items-end justify-center" onClick={() => setShowEditProfile(false)}>
-          <div className="bg-white rounded-t-3xl p-5 w-full max-w-[430px] animate-slideUp max-h-[80vh] overflow-y-auto" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-gray-800 mb-4">Edit Profile</h3>
+          <div className="rounded-t-3xl p-5 w-full max-w-[430px] animate-slideUp max-h-[80vh] overflow-y-auto" style={{ backgroundColor: theme.bgCard }} onClick={(e) => e.stopPropagation()}>
+            <h3 className="text-lg font-bold mb-4" style={{ color: theme.text }}>Edit Profile</h3>
             <div className="space-y-3">
               {[
                 { key: 'displayName', label: 'Display Name', icon: User, type: 'text' },
@@ -218,12 +224,13 @@ export default function Profile() {
                 { key: 'occupation', label: 'Occupation', icon: Briefcase, type: 'text' },
               ].map(({ key, label, icon: Icon, type, options }) => (
                 <div key={key}>
-                  <label className="text-xs font-medium text-gray-500 mb-1 flex items-center gap-1"><Icon size={12} /> {label}</label>
+                  <label className="text-xs font-medium mb-1 flex items-center gap-1" style={{ color: theme.textSecondary }}><Icon size={12} /> {label}</label>
                   {type === 'select' ? (
                     <select
                       value={editForm[key]}
                       onChange={(e) => setEditForm({ ...editForm, [key]: e.target.value })}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-[#f65e1d]"
+                      className="w-full px-3 py-2.5 text-sm border rounded-xl outline-none"
+                      style={{ backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.border }}
                     >
                       <option value="">Select {label}</option>
                       {options.map((o) => <option key={o} value={o}>{o}</option>)}
@@ -234,15 +241,16 @@ export default function Profile() {
                       value={editForm[key]}
                       onChange={(e) => setEditForm({ ...editForm, [key]: e.target.value })}
                       placeholder={`Enter ${label.toLowerCase()}`}
-                      className="w-full px-3 py-2.5 text-sm border border-gray-200 rounded-xl bg-gray-50 outline-none focus:border-[#f65e1d]"
+                      className="w-full px-3 py-2.5 text-sm border rounded-xl outline-none"
+                      style={{ backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.border }}
                     />
                   )}
                 </div>
               ))}
             </div>
             <div className="flex gap-2 mt-4">
-              <button onClick={() => setShowEditProfile(false)} className="flex-1 py-2.5 bg-gray-100 text-gray-600 rounded-xl border-none cursor-pointer text-sm font-medium">Cancel</button>
-              <button onClick={handleSaveProfile} disabled={editLoading} className="flex-1 py-2.5 bg-[#f65e1d] text-white rounded-xl border-none cursor-pointer text-sm font-medium disabled:opacity-60">
+              <button onClick={() => setShowEditProfile(false)} className="flex-1 py-2.5 rounded-xl border-none cursor-pointer text-sm font-medium" style={{ backgroundColor: theme.inputBg, color: theme.textSecondary }}>Cancel</button>
+              <button onClick={handleSaveProfile} disabled={editLoading} className="flex-1 py-2.5 text-white rounded-xl border-none cursor-pointer text-sm font-medium disabled:opacity-60" style={{ backgroundColor: theme.brand }}>
                 {editLoading ? 'Saving...' : 'Save Changes'}
               </button>
             </div>
@@ -251,7 +259,7 @@ export default function Profile() {
       )}
 
       {/* Reward Points */}
-      <div className="bg-gradient-to-r from-[#f65e1d] to-[#ff9800] rounded-2xl p-4 mb-4 text-white shadow-lg">
+      <div className="rounded-2xl p-4 mb-4 text-white shadow-lg" style={{ background: `linear-gradient(135deg, ${theme.brand}, ${theme.brandLight})` }}>
         <div className="flex items-center justify-between">
           <div>
             <p className="text-xs text-white/70">Reward Points</p>
@@ -265,21 +273,21 @@ export default function Profile() {
       <div className="flex gap-3 mb-4 flex-wrap">
         <div className="flex-1 min-w-[180px]">
           <div className="flex items-center justify-between mb-2">
-            <h4 className="text-sm font-semibold text-gray-500">Personal Details</h4>
-            <button onClick={() => setShowEditProfile(true)} className="text-xs text-[#f65e1d] flex items-center gap-1 bg-transparent border-none cursor-pointer">
+            <h4 className="text-sm font-semibold" style={{ color: theme.textSecondary }}>Personal Details</h4>
+            <button onClick={() => setShowEditProfile(true)} className="text-xs flex items-center gap-1 bg-transparent border-none cursor-pointer" style={{ color: theme.brand }}>
               <Edit3 size={12} /> Edit
             </button>
           </div>
-          <div className="bg-white rounded-xl p-4 shadow-sm space-y-2">
-            <p className="text-sm"><strong>Name:</strong> {displayName}</p>
-            <p className="text-sm"><strong>Phone:</strong> {profile.countryCode || '+91'}-{profile.phone}</p>
-            {profile.email && <p className="text-sm"><strong>Email:</strong> {profile.email}</p>}
-            {profile.dob && <p className="text-sm"><strong>DOB:</strong> {profile.dob}</p>}
-            {profile.gender && <p className="text-sm"><strong>Gender:</strong> {profile.gender}</p>}
-            {profile.address && <p className="text-sm"><strong>Address:</strong> {profile.address}</p>}
-            {profile.occupation && <p className="text-sm"><strong>Occupation:</strong> {profile.occupation}</p>}
+          <div className="rounded-xl p-4 shadow-sm space-y-2" style={{ backgroundColor: theme.bgCard }}>
+            <p className="text-sm" style={{ color: theme.text }}><strong>Name:</strong> {displayName}</p>
+            <p className="text-sm" style={{ color: theme.text }}><strong>Phone:</strong> {profile.countryCode || '+91'}-{profile.phone}</p>
+            {profile.email && <p className="text-sm" style={{ color: theme.text }}><strong>Email:</strong> {profile.email}</p>}
+            {profile.dob && <p className="text-sm" style={{ color: theme.text }}><strong>DOB:</strong> {profile.dob}</p>}
+            {profile.gender && <p className="text-sm" style={{ color: theme.text }}><strong>Gender:</strong> {profile.gender}</p>}
+            {profile.address && <p className="text-sm" style={{ color: theme.text }}><strong>Address:</strong> {profile.address}</p>}
+            {profile.occupation && <p className="text-sm" style={{ color: theme.text }}><strong>Occupation:</strong> {profile.occupation}</p>}
             {!profile.profileCompleted && (
-              <button onClick={() => setShowEditProfile(true)} className="text-xs text-[#f65e1d] font-medium underline bg-transparent border-none cursor-pointer mt-1">
+              <button onClick={() => setShowEditProfile(true)} className="text-xs font-medium underline bg-transparent border-none cursor-pointer mt-1" style={{ color: theme.brand }}>
                 Complete your profile for rewards!
               </button>
             )}
@@ -287,12 +295,12 @@ export default function Profile() {
         </div>
 
         <div className="flex-1 min-w-[120px]">
-          <h4 className="text-sm font-semibold text-gray-500 mb-2">UPI IDs</h4>
-          <div className="bg-orange-50 border-2 border-dashed border-[#f65e1d] rounded-xl p-4 text-center shadow-sm">
+          <h4 className="text-sm font-semibold mb-2" style={{ color: theme.textSecondary }}>UPI IDs</h4>
+          <div className="border-2 border-dashed rounded-xl p-4 text-center shadow-sm" style={{ backgroundColor: theme.brandBg, borderColor: theme.brand }}>
             {upiIds.map((upi, i) => (
               <div key={i} className="flex items-center justify-between gap-1 mb-1">
-                <span className="text-sm text-orange-700 font-medium truncate">{upi}</span>
-                <button onClick={() => handleCopyUpi(upi)} className="bg-transparent border-none cursor-pointer text-[#f65e1d]">
+                <span className="text-sm font-medium truncate" style={{ color: theme.brand }}>{upi}</span>
+                <button onClick={() => handleCopyUpi(upi)} className="bg-transparent border-none cursor-pointer" style={{ color: theme.brand }}>
                   {copied ? <Check size={14} /> : <Copy size={14} />}
                 </button>
               </div>
@@ -302,29 +310,31 @@ export default function Profile() {
       </div>
 
       {/* Referral Strip */}
-      <div className="bg-gradient-to-r from-orange-50 to-orange-100 rounded-2xl p-4 mb-4 shadow-sm">
+      <div className="rounded-2xl p-4 mb-4 shadow-sm" style={{ backgroundColor: theme.bgCard, border: `1px solid ${theme.border}` }}>
         <div className="flex items-center justify-between gap-3 mb-2">
           <div>
-            <p className="text-sm font-semibold text-[#f65e1d]">Your Referral Code</p>
-            <p className="text-lg font-bold text-gray-800">{profile.referralCode || 'N/A'}</p>
+            <p className="text-sm font-semibold" style={{ color: theme.brand }}>Your Referral Code</p>
+            <p className="text-lg font-bold" style={{ color: theme.text }}>{profile.referralCode || 'N/A'}</p>
           </div>
           <button
             onClick={() => { navigator.clipboard.writeText(profile.referralCode || ''); setCopied(true); setTimeout(() => setCopied(false), 2000); }}
-            className="px-3 py-1.5 bg-[#f65e1d] text-white text-sm rounded-lg border-none cursor-pointer"
+            className="px-3 py-1.5 text-white text-sm rounded-lg border-none cursor-pointer"
+            style={{ backgroundColor: theme.brand }}
           >
             {copied ? 'Copied!' : 'Copy'}
           </button>
         </div>
         {!profile.referredBy && (
-          <div className="flex items-center gap-2 mt-2 pt-2 border-t border-orange-200">
+          <div className="flex items-center gap-2 mt-2 pt-2" style={{ borderTop: `1px solid ${theme.border}` }}>
             <input
               type="text"
               value={referralCode}
               onChange={(e) => setReferralCode(e.target.value)}
               placeholder="Enter friend's code"
-              className="flex-1 px-3 py-2 text-sm border border-[#f65e1d]/30 rounded-lg outline-none focus:border-[#f65e1d] bg-white"
+              className="flex-1 px-3 py-2 text-sm border rounded-lg outline-none"
+              style={{ backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.border }}
             />
-            <button onClick={handleApplyReferral} className="px-4 py-2 bg-[#f65e1d] text-white text-sm rounded-lg border-none cursor-pointer hover:bg-[#e3571a] transition-colors font-medium">
+            <button onClick={handleApplyReferral} className="px-4 py-2 text-white text-sm rounded-lg border-none cursor-pointer font-medium" style={{ backgroundColor: theme.brand }}>
               Apply
             </button>
           </div>
@@ -336,27 +346,29 @@ export default function Profile() {
       {/* Menu Items */}
       <div className="flex flex-col gap-3">
         {[
-          { icon: Gift, label: 'Referral Program', color: '#f65e1d', onClick: () => navigate('/referral') },
-          { icon: Settings, label: 'Settings', color: '#f65e1d', onClick: () => navigate('/settings') },
-          { icon: Info, label: 'About GradPay', color: '#f65e1d', onClick: () => navigate('/faqs') },
-        ].map(({ icon: Icon, label, color, onClick }) => (
+          { icon: Gift, label: 'Referral Program', onClick: () => navigate('/referral') },
+          { icon: Settings, label: 'Settings', onClick: () => navigate('/settings') },
+          { icon: Info, label: 'About GradPay', onClick: () => navigate('/faqs') },
+        ].map(({ icon: Icon, label, onClick }) => (
           <button
             key={label}
             onClick={onClick}
-            className="flex items-center justify-between px-5 py-4 bg-white/60 border border-[#f65e1d]/20 rounded-2xl shadow-sm hover:bg-orange-50 hover:-translate-y-0.5 transition-all cursor-pointer backdrop-blur-sm"
+            className="flex items-center justify-between px-5 py-4 rounded-2xl shadow-sm hover:-translate-y-0.5 transition-all cursor-pointer"
+            style={{ backgroundColor: theme.bgCard, border: `1px solid ${theme.border}` }}
           >
             <div className="flex items-center gap-3">
-              <Icon size={20} style={{ color }} />
-              <span className="text-base font-medium text-gray-700">{label}</span>
+              <Icon size={20} style={{ color: theme.brand }} />
+              <span className="text-base font-medium" style={{ color: theme.text }}>{label}</span>
             </div>
-            <ChevronRight size={18} className="text-gray-400" />
+            <ChevronRight size={18} style={{ color: theme.textMuted }} />
           </button>
         ))}
 
         {/* Logout */}
         <button
           onClick={handleLogout}
-          className="flex items-center justify-between px-5 py-4 bg-white/60 border border-red-200 rounded-2xl shadow-sm hover:bg-red-50 transition-all cursor-pointer"
+          className="flex items-center justify-between px-5 py-4 rounded-2xl shadow-sm hover:bg-red-50 transition-all cursor-pointer"
+          style={{ backgroundColor: theme.bgCard, border: '1px solid #fca5a5' }}
         >
           <div className="flex items-center gap-3">
             <LogOut size={20} className="text-red-500" />

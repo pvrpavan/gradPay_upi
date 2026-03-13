@@ -1,5 +1,6 @@
 import { BrowserRouter, Routes, Route, Navigate } from 'react-router-dom';
 import { AuthProvider, useAuth } from './context/AuthContext';
+import { ThemeProvider } from './context/ThemeContext';
 import GetStarted from './pages/GetStarted';
 import Login from './pages/Login';
 import CreateAccount from './pages/CreateAccount';
@@ -16,6 +17,7 @@ import Deposit from './pages/Deposit';
 import Settings from './pages/Settings';
 import Referral from './pages/Referral';
 import UtilityPayment from './pages/UtilityPayment';
+import Notifications from './pages/Notifications';
 
 function ProtectedRoute({ children }) {
   const { phone, loading } = useAuth();
@@ -49,6 +51,7 @@ function AppRoutes() {
       <Route path="/settings" element={<ProtectedRoute><Settings /></ProtectedRoute>} />
       <Route path="/referral" element={<ProtectedRoute><Referral /></ProtectedRoute>} />
       <Route path="/utility" element={<ProtectedRoute><UtilityPayment /></ProtectedRoute>} />
+      <Route path="/notifications" element={<ProtectedRoute><Notifications /></ProtectedRoute>} />
       <Route path="*" element={<Navigate to="/" replace />} />
     </Routes>
   );
@@ -57,9 +60,11 @@ function AppRoutes() {
 export default function App() {
   return (
     <BrowserRouter>
-      <AuthProvider>
-        <AppRoutes />
-      </AuthProvider>
+      <ThemeProvider>
+        <AuthProvider>
+          <AppRoutes />
+        </AuthProvider>
+      </ThemeProvider>
     </BrowserRouter>
   );
 }
