@@ -8,7 +8,7 @@
   }
   body {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: var(--theme-bg, #fff5ec);
+    background: var(--theme-bg, #F8F7FF);
     min-height: 100vh;
     display: flex;
     justify-content: center;
@@ -38,11 +38,11 @@
 }
 
 @layer utilities {
-  .gradient-orange {
-    background: linear-gradient(135deg, var(--theme-brand, #f65e1d), var(--theme-brandLight, #ff9800));
+  .gradient-brand {
+    background: linear-gradient(135deg, var(--theme-brand, #6C63FF), var(--theme-brandLight, #A78BFA));
   }
   .gradient-warm {
-    background: linear-gradient(135deg, var(--theme-gradientFrom, #fef9f6), var(--theme-gradientTo, #fdefe8));
+    background: linear-gradient(135deg, var(--theme-gradientFrom, #F8F7FF), var(--theme-gradientTo, #EDE9FE));
   }
   .gradient-gold {
     background: linear-gradient(145deg, #fde1aa, #ffebc7);
@@ -52,13 +52,13 @@
     backdrop-filter: blur(10px);
   }
   .text-brand {
-    color: var(--theme-brand, #f65e1d);
+    color: var(--theme-brand, #6C63FF);
   }
   .bg-brand {
-    background-color: var(--theme-brand, #f65e1d);
+    background-color: var(--theme-brand, #6C63FF);
   }
   .border-brand {
-    border-color: var(--theme-brand, #f65e1d);
+    border-color: var(--theme-brand, #6C63FF);
   }
 
   /* Theme-aware utility classes */
@@ -86,8 +86,8 @@
 }
 
 @keyframes pulse-glow {
-  0%, 100% { box-shadow: 0 0 0 0 rgba(246, 94, 29, 0.4); }
-  50% { box-shadow: 0 0 0 10px rgba(246, 94, 29, 0); }
+  0%, 100% { box-shadow: 0 0 0 0 rgba(108, 99, 255, 0.4); }
+  50% { box-shadow: 0 0 0 10px rgba(108, 99, 255, 0); }
 }
 
 @keyframes float {
@@ -147,8 +147,8 @@
 }
 
 @keyframes glow-pulse {
-  0%, 100% { box-shadow: 0 0 5px rgba(246, 94, 29, 0.3), 0 0 10px rgba(246, 94, 29, 0.1); }
-  50% { box-shadow: 0 0 15px rgba(246, 94, 29, 0.5), 0 0 30px rgba(246, 94, 29, 0.2); }
+  0%, 100% { box-shadow: 0 0 5px rgba(108, 99, 255, 0.3), 0 0 10px rgba(108, 99, 255, 0.1); }
+  50% { box-shadow: 0 0 15px rgba(108, 99, 255, 0.5), 0 0 30px rgba(108, 99, 255, 0.2); }
 }
 
 @keyframes slide-up-stagger {
@@ -239,7 +239,7 @@
 }
 .card-3d:hover {
   transform: perspective(600px) rotateX(2deg) rotateY(-2deg) translateY(-4px);
-  box-shadow: 0 12px 24px -8px rgba(246, 94, 29, 0.2);
+  box-shadow: 0 12px 24px -8px rgba(108, 99, 255, 0.2);
 }
 
 /* Glass morphism card */

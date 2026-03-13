@@ -6,10 +6,10 @@ export default function LoadingOverlay({ message = 'Processing...' }) {
       <div className="bg-white rounded-3xl p-8 flex flex-col items-center gap-4 shadow-2xl animate-slideUp max-w-xs w-full mx-4">
         {/* 3D-style animated loader */}
         <div className="relative w-20 h-20">
-          <div className="absolute inset-0 rounded-full border-4 border-[#f65e1d]/20" />
-          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#f65e1d] animate-spin" />
-          <div className="absolute inset-2 rounded-full border-4 border-transparent border-b-[#ff9800] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
-          <div className="absolute inset-4 rounded-full bg-gradient-to-br from-[#f65e1d] to-[#ff9800] flex items-center justify-center shadow-lg">
+          <div className="absolute inset-0 rounded-full border-4 border-[#6C63FF]/20" />
+          <div className="absolute inset-0 rounded-full border-4 border-transparent border-t-[#6C63FF] animate-spin" />
+          <div className="absolute inset-2 rounded-full border-4 border-transparent border-b-[#A78BFA] animate-spin" style={{ animationDirection: 'reverse', animationDuration: '0.8s' }} />
+          <div className="absolute inset-4 rounded-full bg-gradient-to-br from-[#6C63FF] to-[#A78BFA] flex items-center justify-center shadow-lg">
             <span className="text-white text-lg font-bold">G</span>
           </div>
         </div>
@@ -21,7 +21,7 @@ export default function LoadingOverlay({ message = 'Processing...' }) {
           {[0, 1, 2].map((i) => (
             <div
               key={i}
-              className="w-2 h-2 rounded-full bg-[#f65e1d]"
+              className="w-2 h-2 rounded-full bg-[#6C63FF]"
               style={{ animation: `bounce 1.4s ease-in-out ${i * 0.16}s infinite both` }}
             />
           ))}

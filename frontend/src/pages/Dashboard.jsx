@@ -8,7 +8,7 @@ import BottomNav from '../components/BottomNav';
 import Avatar from '../components/Avatar';
 
 const quickActions = [
-  { icon: Send, label: 'Send Money', path: '/send-money', color: 'from-orange-400 to-orange-500' },
+  { icon: Send, label: 'Send Money', path: '/send-money', color: 'from-indigo-400 to-indigo-500' },
   { icon: ArrowDownCircle, label: 'Deposit', path: '/deposit', color: 'from-green-400 to-green-500' },
   { icon: Wallet, label: 'Balance', path: '/balance', color: 'from-blue-400 to-blue-500' },
 ];
