@@ -6,6 +6,28 @@ const crypto = require("crypto");
 const generateOtp = () => Math.floor(100000 + Math.random() * 900000).toString();
 const generateReferralCode = (phone) => "GP" + phone.slice(-4) + crypto.randomBytes(2).toString("hex").toUpperCase();
 
+// Send SMS via Textbelt (free tier: 1 SMS/day, or use key "textbelt" for free quota)
+// For production, replace with a paid provider like Twilio, MSG91, or buy a Textbelt key.
+const sendSmsOtp = async (phone, otp) => {
+  try {
+    const response = await fetch("https://textbelt.com/text", {
+      method: "POST",
+      headers: { "Content-Type": "application/json" },
+      body: JSON.stringify({
+        phone: phone.startsWith("+") ? phone : `+91${phone}`,
+        message: `Your GradPay verification code is: ${otp}. Valid for 5 minutes. Do not share this code.`,
+        key: process.env.TEXTBELT_KEY || "textbelt", // "textbelt" = free (1/day), or use a paid key
+      }),
+    });
+    const data = await response.json();
+    console.log("Textbelt SMS response:", JSON.stringify(data));
+    return data;
+  } catch (err) {
+    console.error("SMS send error:", err.message);
+    return { success: false, error: err.message };
+  }
+};
+
 const sendOtp = async (req, res) => {
   const { phone } = req.body;
 
@@ -22,8 +44,23 @@ const sendOtp = async (req, res) => {
 
     console.log(`OTP for ${phone}: ${otp}`);
 
-    // Return OTP in response (for dev/demo - backend holds OTP for auto-fill consent flow)
-    res.status(200).json({ message: "OTP sent successfully", otp });
+    // Attempt to send SMS via Textbelt
+    const smsResult = await sendSmsOtp(phone, otp);
+    const smsSent = smsResult && smsResult.success === true;
+
+    if (smsSent) {
+      console.log(`SMS sent successfully to ${phone}`);
+    } else {
+      console.warn(`SMS failed for ${phone}: ${smsResult?.error || "quota exceeded"}. OTP returned in response for dev/demo.`);
+    }
+
+    // Return OTP in response for dev/demo auto-fill flow
+    // In production, remove the otp field from this response
+    res.status(200).json({
+      message: smsSent ? "OTP sent to your mobile" : "OTP sent successfully",
+      otp,
+      smsSent,
+    });
   } catch (err) {
     res.status(500).json({ error: "Failed to send OTP" });
   }
@@ -287,6 +324,28 @@ const verifyUpiPin = async (req, res) => {
   }
 };
 
+const changeUpiPin = async (req, res) => {
+  const { phone, oldPin, newPin } = req.body;
+  if (!phone || !oldPin || !newPin) return res.status(400).json({ error: "Phone, old PIN, and new PIN are required" });
+  if (newPin.length < 4 || newPin.length > 6) return res.status(400).json({ error: "New UPI PIN must be 4-6 digits" });
+
+  try {
+    const user = await User.findOne({ phone });
+    if (!user) return res.status(404).json({ error: "User not found" });
+    if (!user.upi_pin) return res.status(400).json({ error: "UPI PIN not set. Please set it first.", notSet: true });
+    if (user.upi_pin !== oldPin) return res.status(400).json({ error: "Current UPI PIN is incorrect" });
+    if (oldPin === newPin) return res.status(400).json({ error: "New PIN must be different from current PIN" });
+
+    user.upi_pin = newPin;
+    await user.save();
+
+    res.status(200).json({ message: "UPI PIN changed successfully" });
+  } catch (err) {
+    console.error(err);
+    res.status(500).json({ error: "Failed to change UPI PIN" });
+  }
+};
+
 const getAllUsers = async (req, res) => {
   const { exclude } = req.query;
   try {
@@ -426,6 +485,7 @@ module.exports = {
   applyReferral,
   setUpiPin,
   verifyUpiPin,
+  changeUpiPin,
   getAllUsers,
   searchUsers,
   seedData,
