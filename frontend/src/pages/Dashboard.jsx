@@ -58,7 +58,7 @@ export default function Dashboard() {
 
       <main className="px-4 pt-4">
         {/* Banner */}
-        <div className="w-full mb-5 rounded-2xl overflow-hidden shadow-md animate-fadeIn">
+        <div className="w-full mb-5 rounded-2xl overflow-hidden shadow-md animate-fadeIn animate-tilt-3d" style={{ animationIterationCount: 1, animationDuration: '0.8s' }}>
           <img src="/photos/index_photo_no_bg.png" alt="GradPay" className="w-full h-auto object-contain rounded-2xl" />
         </div>
 
@@ -72,7 +72,7 @@ export default function Dashboard() {
                 onClick={() => navigate(path)}
                 className={`flex flex-col items-center gap-2 py-4 px-2 rounded-2xl bg-gradient-to-br ${color} text-white shadow-md hover:shadow-lg hover:-translate-y-1 transition-all cursor-pointer border-none transform active:scale-95`}
               >
-                <div className="animate-3d-float">
+                <div className="animate-wave">
                   <Icon size={24} />
                 </div>
                 <span className="text-xs font-semibold">{label}</span>
@@ -93,11 +93,11 @@ export default function Dashboard() {
             </button>
           </div>
           <div className="grid grid-cols-3 gap-3">
-            {utilities.map(({ icon: Icon, label, type, color }) => (
+            {utilities.map(({ icon: Icon, label, type, color }, i) => (
               <button
                 key={label}
                 onClick={() => navigate(`/utility?type=${type}`)}
-                className={`flex flex-col items-center gap-2 p-3 rounded-2xl ${color} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer border-none`}
+                className={`flex flex-col items-center gap-2 p-3 rounded-2xl ${color} shadow-sm hover:shadow-md hover:-translate-y-0.5 transition-all cursor-pointer border-none card-3d animate-stagger-${i + 1}`}
               >
                 <Icon size={20} />
                 <span className="text-[11px] font-semibold">{label}</span>
@@ -108,7 +108,7 @@ export default function Dashboard() {
 
         {/* Rewards Card */}
         <section className="mb-6">
-          <div className="bg-gradient-to-r from-[#f65e1d] to-[#ff9800] rounded-2xl p-5 text-white shadow-lg relative overflow-hidden animate-gradient-shift">
+          <div className="bg-gradient-to-r from-[#f65e1d] to-[#ff9800] rounded-2xl p-5 text-white shadow-lg relative overflow-hidden animate-gradient-shift animate-glow-pulse">
             <div className="absolute -top-6 -right-6 w-24 h-24 bg-white/10 rounded-full" />
             <div className="absolute -bottom-4 -left-4 w-16 h-16 bg-white/10 rounded-full" />
             <div className="relative z-10 flex items-center justify-between">

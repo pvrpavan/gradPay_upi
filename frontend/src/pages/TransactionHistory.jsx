@@ -22,7 +22,16 @@ export default function TransactionHistory() {
         const upiId = Array.isArray(data.upi_id) ? data.upi_id[0] : data.upi_id;
         if (upiId) {
           api.getTransactionHistory(upiId, { limit: 50 }).then((res) => {
-            setTransactions(res.transactions || []);
+            // Deduplicate transactions by _id to prevent duplicate display
+            const txList = res.transactions || [];
+            const seen = new Set();
+            const unique = txList.filter((tx) => {
+              const key = tx._id || `${tx.sender_upi}-${tx.receiver_upi}-${tx.amount}-${tx.timestamp}`;
+              if (seen.has(key)) return false;
+              seen.add(key);
+              return true;
+            });
+            setTransactions(unique);
             setLoading(false);
           }).catch(() => setLoading(false));
         } else {

@@ -2,7 +2,43 @@ import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { api } from '../utils/api';
-import { ArrowLeft, Star, Gift, Settings, Info, LogOut, QrCode, Copy, Check, Camera, Edit3, User, Mail, MapPin, Briefcase, Calendar, ChevronRight } from 'lucide-react';
+import { ArrowLeft, Star, Gift, Settings, Info, LogOut, QrCode, Copy, Check, Camera, Edit3, User, Mail, MapPin, Briefcase, Calendar, ChevronRight, Loader2 } from 'lucide-react';
+
+function QrModal({ upiId, onClose }) {
+  const [qrData, setQrData] = useState(null);
+  const [loading, setLoading] = useState(true);
+
+  useEffect(() => {
+    if (upiId) {
+      api.getQRCode(upiId).then((data) => {
+        setQrData(data);
+        setLoading(false);
+      }).catch(() => setLoading(false));
+    }
+  }, [upiId]);
+
+  return (
+    <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4" onClick={onClose}>
+      <div className="bg-white rounded-2xl p-6 text-center w-full max-w-xs animate-bounce-in" onClick={(e) => e.stopPropagation()}>
+        <h3 className="text-lg font-bold text-gray-800 mb-3">Your QR Code</h3>
+        {loading ? (
+          <div className="w-48 h-48 mx-auto flex items-center justify-center">
+            <Loader2 size={32} className="text-[#f65e1d] animate-spin" />
+          </div>
+        ) : qrData?.qrCode ? (
+          <img src={qrData.qrCode} alt="QR Code" className="w-48 h-48 mx-auto rounded-xl" />
+        ) : (
+          <div className="w-48 h-48 mx-auto bg-gray-100 rounded-xl flex flex-col items-center justify-center gap-2">
+            <QrCode size={48} className="text-gray-300" />
+            <p className="text-xs text-gray-400">QR not available</p>
+          </div>
+        )}
+        <p className="text-xs text-gray-400 mt-3">Scan to pay {upiId}</p>
+        <button onClick={onClose} className="mt-4 px-6 py-2 bg-[#f65e1d] text-white rounded-xl border-none cursor-pointer text-sm font-medium">Close</button>
+      </div>
+    </div>
+  );
+}
 
 export default function Profile() {
   const navigate = useNavigate();
@@ -164,20 +200,7 @@ export default function Profile() {
 
       {/* QR Code Modal */}
       {showQr && (
-        <div className="fixed inset-0 bg-black/50 z-50 flex items-center justify-center px-4" onClick={() => setShowQr(false)}>
-          <div className="bg-white rounded-2xl p-6 text-center w-full max-w-xs animate-slideUp" onClick={(e) => e.stopPropagation()}>
-            <h3 className="text-lg font-bold text-gray-800 mb-3">Your QR Code</h3>
-            {profile.qr_code_url ? (
-              <img src={profile.qr_code_url} alt="QR Code" className="w-48 h-48 mx-auto rounded-xl" />
-            ) : (
-              <div className="w-48 h-48 mx-auto bg-gray-100 rounded-xl flex items-center justify-center">
-                <QrCode size={48} className="text-gray-300" />
-              </div>
-            )}
-            <p className="text-xs text-gray-400 mt-3">Scan to pay {upiIds[0]}</p>
-            <button onClick={() => setShowQr(false)} className="mt-4 px-6 py-2 bg-[#f65e1d] text-white rounded-xl border-none cursor-pointer text-sm font-medium">Close</button>
-          </div>
-        </div>
+        <QrModal upiId={upiIds[0]} onClose={() => setShowQr(false)} />
       )}
 
       {/* Edit Profile Modal */}
