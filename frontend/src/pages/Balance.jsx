@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { api } from '../utils/api';
 import TopBar from '../components/TopBar';
 import { Wallet, TrendingUp, TrendingDown, Plus, Send, ArrowUpRight, ArrowDownLeft, Eye, EyeOff } from 'lucide-react';
@@ -8,6 +9,7 @@ import { Wallet, TrendingUp, TrendingDown, Plus, Send, ArrowUpRight, ArrowDownLe
 export default function Balance() {
   const navigate = useNavigate();
   const { phone } = useAuth();
+  const { theme } = useTheme();
   const [balance, setBalance] = useState(null);
   const [loading, setLoading] = useState(true);
   const [showBalance, setShowBalance] = useState(true);
@@ -39,11 +41,11 @@ export default function Balance() {
   }, [phone]);
 
   return (
-    <div className="min-h-screen gradient-warm">
+    <div className="min-h-screen" style={{ background: `linear-gradient(135deg, ${theme.gradientFrom}, ${theme.gradientTo})` }}>
       <TopBar title="My Wallet" />
       <main className="px-5 pt-6 pb-8 animate-fadeIn">
         {/* Balance Card */}
-        <div className="bg-gradient-to-br from-[#f65e1d] to-[#ff9800] rounded-3xl p-6 text-white shadow-xl mb-6 relative overflow-hidden">
+        <div className="rounded-3xl p-6 text-white shadow-xl mb-6 relative overflow-hidden" style={{ background: `linear-gradient(135deg, ${theme.brand}, ${theme.brandLight})` }}>
           <div className="absolute -top-8 -right-8 w-32 h-32 bg-white/10 rounded-full" />
           <div className="absolute -bottom-6 -left-6 w-24 h-24 bg-white/10 rounded-full" />
           <div className="relative z-10">
@@ -71,7 +73,8 @@ export default function Balance() {
             <div className="flex gap-3 mt-5">
               <button
                 onClick={() => navigate('/deposit')}
-                className="flex-1 py-2.5 bg-white text-[#f65e1d] rounded-xl font-semibold text-sm border-none cursor-pointer flex items-center justify-center gap-1.5"
+                className="flex-1 py-2.5 rounded-xl font-semibold text-sm border-none cursor-pointer flex items-center justify-center gap-1.5"
+                style={{ backgroundColor: 'white', color: theme.brand }}
               >
                 <Plus size={16} /> Add Money
               </button>
@@ -87,36 +90,36 @@ export default function Balance() {
 
         {/* Stats Cards */}
         <div className="grid grid-cols-2 gap-4 mb-6">
-          <div className="bg-white rounded-2xl p-4 shadow-sm">
+          <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: theme.bgCard }}>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-full bg-green-100 flex items-center justify-center">
                 <TrendingUp size={16} className="text-green-600" />
               </div>
-              <span className="text-xs text-gray-400">Money In</span>
+              <span className="text-xs" style={{ color: theme.textMuted }}>Money In</span>
             </div>
             <p className="text-lg font-bold text-green-600">{'\u20B9'}{totalIn.toLocaleString('en-IN')}</p>
           </div>
-          <div className="bg-white rounded-2xl p-4 shadow-sm">
+          <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: theme.bgCard }}>
             <div className="flex items-center gap-2 mb-2">
               <div className="w-8 h-8 rounded-full bg-red-100 flex items-center justify-center">
                 <TrendingDown size={16} className="text-red-500" />
               </div>
-              <span className="text-xs text-gray-400">Money Out</span>
+              <span className="text-xs" style={{ color: theme.textMuted }}>Money Out</span>
             </div>
             <p className="text-lg font-bold text-red-500">{'\u20B9'}{totalOut.toLocaleString('en-IN')}</p>
           </div>
         </div>
 
         {/* Recent Transactions */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm">
+        <div className="rounded-2xl p-4 shadow-sm" style={{ backgroundColor: theme.bgCard }}>
           <div className="flex items-center justify-between mb-3">
-            <h4 className="text-sm font-semibold text-gray-700">Recent Activity</h4>
-            <button onClick={() => navigate('/history')} className="text-xs text-[#f65e1d] font-medium bg-transparent border-none cursor-pointer">
+            <h4 className="text-sm font-semibold" style={{ color: theme.textSecondary }}>Recent Activity</h4>
+            <button onClick={() => navigate('/history')} className="text-xs font-medium bg-transparent border-none cursor-pointer" style={{ color: theme.brand }}>
               View All
             </button>
           </div>
           {transactions.length === 0 ? (
-            <p className="text-xs text-gray-400 text-center py-4">No recent transactions</p>
+            <p className="text-xs text-center py-4" style={{ color: theme.textMuted }}>No recent transactions</p>
           ) : (
             <div className="space-y-3">
               {transactions.map((tx, i) => {
@@ -133,8 +136,8 @@ export default function Balance() {
                          <ArrowDownLeft size={14} className="text-green-500" />}
                       </div>
                       <div>
-                        <p className="text-xs font-semibold text-gray-700">{tx.note || (isDeposit ? 'Deposit' : 'Transfer')}</p>
-                        <p className="text-[10px] text-gray-400">{new Date(tx.timestamp).toLocaleDateString()}</p>
+                        <p className="text-xs font-semibold" style={{ color: theme.text }}>{tx.note || (isDeposit ? 'Deposit' : 'Transfer')}</p>
+                        <p className="text-[10px]" style={{ color: theme.textMuted }}>{new Date(tx.timestamp).toLocaleDateString()}</p>
                       </div>
                     </div>
                     <span className={`text-xs font-bold ${

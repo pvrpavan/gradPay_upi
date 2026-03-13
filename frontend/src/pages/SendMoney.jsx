@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { api } from '../utils/api';
 import TopBar from '../components/TopBar';
 import UpiPinModal from '../components/UpiPinModal';
 import LoadingOverlay from '../components/LoadingOverlay';
+import Avatar from '../components/Avatar';
 import { Search, User, Send, Loader2, CheckCircle2, Users } from 'lucide-react';
 
 export default function SendMoney() {
   const navigate = useNavigate();
   const { phone } = useAuth();
+  const { theme } = useTheme();
   const [profile, setProfile] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
@@ -68,7 +71,6 @@ export default function SendMoney() {
       return;
     }
 
-    // Simulate processing delay for better UX
     await new Promise((r) => setTimeout(r, 1500));
 
     try {
@@ -95,19 +97,19 @@ export default function SendMoney() {
 
   if (success) {
     return (
-      <div className="min-h-screen gradient-warm flex flex-col items-center justify-center animate-fadeIn">
-        <div className="bg-white rounded-3xl shadow-xl p-8 text-center">
+      <div className="min-h-screen flex flex-col items-center justify-center animate-fadeIn" style={{ background: `linear-gradient(135deg, ${theme.gradientFrom}, ${theme.gradientTo})` }}>
+        <div className="rounded-3xl shadow-xl p-8 text-center" style={{ backgroundColor: theme.bgCard }}>
           <CheckCircle2 size={64} className="text-green-500 mx-auto mb-4" />
-          <h2 className="text-xl font-bold text-gray-800 mb-2">Payment Successful!</h2>
-          <p className="text-gray-500">{'\u20B9'}{parseFloat(amount).toLocaleString('en-IN')} sent to {selectedUser?.displayName}</p>
-          <p className="text-sm text-gray-400 mt-2">Redirecting to dashboard...</p>
+          <h2 className="text-xl font-bold mb-2" style={{ color: theme.text }}>Payment Successful!</h2>
+          <p style={{ color: theme.textSecondary }}>{'\u20B9'}{parseFloat(amount).toLocaleString('en-IN')} sent to {selectedUser?.displayName}</p>
+          <p className="text-sm mt-2" style={{ color: theme.textMuted }}>Redirecting to dashboard...</p>
         </div>
       </div>
     );
   }
 
   return (
-    <div className="min-h-screen gradient-warm">
+    <div className="min-h-screen" style={{ background: `linear-gradient(135deg, ${theme.gradientFrom}, ${theme.gradientTo})` }}>
       <TopBar title="Send Money" />
 
       {showProcessing && <LoadingOverlay message="Processing Payment..." />}
@@ -121,19 +123,21 @@ export default function SendMoney() {
 
       <main className="px-4 pt-5 pb-8 animate-fadeIn">
         {/* Search */}
-        <div className="flex items-center gap-2 bg-white rounded-xl px-4 py-3 mb-4 shadow-sm border-2 border-gray-100 focus-within:border-[#f65e1d] transition-colors">
-          <Search size={18} className="text-[#f65e1d]" />
+        <div className="flex items-center gap-2 rounded-xl px-4 py-3 mb-4 shadow-sm border-2 transition-colors" style={{ backgroundColor: theme.bgCard, borderColor: theme.border }}>
+          <Search size={18} style={{ color: theme.brand }} />
           <input
             type="text"
             placeholder="Search phone number or UPI ID"
             value={searchQuery}
             onChange={(e) => setSearchQuery(e.target.value)}
             onKeyDown={(e) => e.key === 'Enter' && handleSearch()}
-            className="flex-1 bg-transparent border-none outline-none text-sm text-gray-800 placeholder-gray-400"
+            className="flex-1 bg-transparent border-none outline-none text-sm"
+            style={{ color: theme.text }}
           />
           <button
             onClick={handleSearch}
-            className="px-3 py-1.5 bg-[#f65e1d] text-white text-xs rounded-lg border-none cursor-pointer font-medium"
+            className="px-3 py-1.5 text-white text-xs rounded-lg border-none cursor-pointer font-medium"
+            style={{ backgroundColor: theme.brand }}
           >
             Search
           </button>
@@ -142,19 +146,18 @@ export default function SendMoney() {
         {/* Search Results */}
         {searchResults.length > 0 && !selectedUser && (
           <div className="mb-4 space-y-2">
-            <h4 className="text-sm font-semibold text-gray-500">Search Results</h4>
+            <h4 className="text-sm font-semibold" style={{ color: theme.textSecondary }}>Search Results</h4>
             {searchResults.map((u, i) => (
               <button
                 key={i}
                 onClick={() => setSelectedUser(u)}
-                className="w-full flex items-center gap-3 bg-white rounded-xl p-3 shadow-sm hover:bg-orange-50 transition-colors cursor-pointer border-none text-left"
+                className="w-full flex items-center gap-3 rounded-xl p-3 shadow-sm transition-colors cursor-pointer border-none text-left"
+                style={{ backgroundColor: theme.bgCard }}
               >
-                <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                  <User size={18} className="text-[#f65e1d]" />
-                </div>
+                <Avatar name={u.displayName} size={40} />
                 <div>
-                  <p className="text-sm font-semibold text-gray-800">{u.displayName}</p>
-                  <p className="text-xs text-gray-400">{u.phone}</p>
+                  <p className="text-sm font-semibold" style={{ color: theme.text }}>{u.displayName}</p>
+                  <p className="text-xs" style={{ color: theme.textMuted }}>{u.phone}</p>
                 </div>
               </button>
             ))}
@@ -164,42 +167,43 @@ export default function SendMoney() {
         {/* Selected User & Amount */}
         {selectedUser && (
           <div className="animate-slideUp">
-            <div className="flex items-center gap-3 bg-orange-50 rounded-xl p-4 mb-4 border border-[#f65e1d]/20">
-              <div className="w-12 h-12 rounded-full bg-orange-100 flex items-center justify-center">
-                <User size={20} className="text-[#f65e1d]" />
-              </div>
+            <div className="flex items-center gap-3 rounded-xl p-4 mb-4" style={{ backgroundColor: theme.brandBg, border: `1px solid ${theme.brand}30` }}>
+              <Avatar name={selectedUser.displayName} size={48} />
               <div className="flex-1">
-                <p className="text-sm font-bold text-gray-800">{selectedUser.displayName}</p>
-                <p className="text-xs text-gray-500">{Array.isArray(selectedUser.upi_id) ? selectedUser.upi_id[0] : selectedUser.upi_id}</p>
+                <p className="text-sm font-bold" style={{ color: theme.text }}>{selectedUser.displayName}</p>
+                <p className="text-xs" style={{ color: theme.textSecondary }}>{Array.isArray(selectedUser.upi_id) ? selectedUser.upi_id[0] : selectedUser.upi_id}</p>
               </div>
               <button
                 onClick={() => { setSelectedUser(null); setSearchResults([]); }}
-                className="text-xs text-gray-400 bg-transparent border-none cursor-pointer"
+                className="text-xs bg-transparent border-none cursor-pointer"
+                style={{ color: theme.textMuted }}
               >
                 Change
               </button>
             </div>
 
-            <div className="bg-white rounded-xl p-4 shadow-sm space-y-4">
+            <div className="rounded-xl p-4 shadow-sm space-y-4" style={{ backgroundColor: theme.bgCard }}>
               <div>
-                <label className="text-xs font-medium text-gray-500 mb-1 block">Amount ({'\u20B9'})</label>
+                <label className="text-xs font-medium mb-1 block" style={{ color: theme.textSecondary }}>Amount ({'\u20B9'})</label>
                 <input
                   type="number"
                   placeholder="0.00"
                   value={amount}
                   onChange={(e) => setAmount(e.target.value)}
-                  className="w-full text-3xl font-bold text-gray-800 border-none outline-none bg-transparent placeholder-gray-300"
+                  className="w-full text-3xl font-bold border-none outline-none bg-transparent"
+                  style={{ color: theme.text }}
                 />
               </div>
 
               <div>
-                <label className="text-xs font-medium text-gray-500 mb-1 block">Note (optional)</label>
+                <label className="text-xs font-medium mb-1 block" style={{ color: theme.textSecondary }}>Note (optional)</label>
                 <input
                   type="text"
                   placeholder="Add a note..."
                   value={note}
                   onChange={(e) => setNote(e.target.value)}
-                  className="w-full text-sm text-gray-700 border border-gray-200 rounded-lg px-3 py-2 outline-none focus:border-[#f65e1d] bg-gray-50"
+                  className="w-full text-sm border rounded-lg px-3 py-2 outline-none"
+                  style={{ backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.border }}
                 />
               </div>
 
@@ -208,7 +212,8 @@ export default function SendMoney() {
               <button
                 onClick={handleInitiateSend}
                 disabled={loading}
-                className="w-full py-3.5 bg-[#f65e1d] hover:bg-[#e5531a] text-white font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border-none text-base disabled:opacity-60"
+                className="w-full py-3.5 text-white font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border-none text-base disabled:opacity-60"
+                style={{ backgroundColor: theme.brand }}
               >
                 {loading ? <Loader2 size={18} className="animate-spin" /> : <Send size={18} />}
                 Pay {'\u20B9'}{amount || '0'}
@@ -220,27 +225,26 @@ export default function SendMoney() {
         {/* All Users List */}
         {!selectedUser && searchResults.length === 0 && (
           <div>
-            <h4 className="text-sm font-semibold text-gray-500 mb-3 flex items-center gap-2">
+            <h4 className="text-sm font-semibold mb-3 flex items-center gap-2" style={{ color: theme.textSecondary }}>
               <Users size={16} /> People on GradPay
             </h4>
             {allUsers.length === 0 ? (
-              <p className="text-sm text-gray-400 text-center py-8">No other users found. Search to find someone.</p>
+              <p className="text-sm text-center py-8" style={{ color: theme.textMuted }}>No other users found. Search to find someone.</p>
             ) : (
               <div className="space-y-2">
                 {allUsers.map((u, i) => (
                   <button
                     key={i}
                     onClick={() => setSelectedUser(u)}
-                    className="w-full flex items-center gap-3 bg-white rounded-xl p-3 shadow-sm hover:bg-orange-50 transition-colors cursor-pointer border-none text-left"
+                    className="w-full flex items-center gap-3 rounded-xl p-3 shadow-sm transition-colors cursor-pointer border-none text-left"
+                    style={{ backgroundColor: theme.bgCard }}
                   >
-                    <div className="w-10 h-10 rounded-full bg-orange-100 flex items-center justify-center">
-                      <User size={18} className="text-[#f65e1d]" />
-                    </div>
+                    <Avatar name={u.displayName} size={40} />
                     <div className="flex-1">
-                      <p className="text-sm font-semibold text-gray-800">{u.displayName}</p>
-                      <p className="text-xs text-gray-400">{Array.isArray(u.upi_id) ? u.upi_id[0] : u.upi_id}</p>
+                      <p className="text-sm font-semibold" style={{ color: theme.text }}>{u.displayName}</p>
+                      <p className="text-xs" style={{ color: theme.textMuted }}>{Array.isArray(u.upi_id) ? u.upi_id[0] : u.upi_id}</p>
                     </div>
-                    <span className="text-xs text-[#f65e1d] font-medium">Pay</span>
+                    <span className="text-xs font-medium" style={{ color: theme.brand }}>Pay</span>
                   </button>
                 ))}
               </div>

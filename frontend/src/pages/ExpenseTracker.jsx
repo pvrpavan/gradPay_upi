@@ -1,5 +1,6 @@
 import { useEffect, useState } from 'react';
 import { useAuth } from '../context/AuthContext';
+import { useTheme } from '../context/ThemeContext';
 import { api } from '../utils/api';
 import TopBar from '../components/TopBar';
 import BottomNav from '../components/BottomNav';
@@ -11,6 +12,7 @@ const CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', '
 
 export default function ExpenseTracker() {
   const { phone } = useAuth();
+  const { theme } = useTheme();
   const [expenses, setExpenses] = useState([]);
   const [stats, setStats] = useState([]);
   const [desc, setDesc] = useState('');
@@ -67,33 +69,36 @@ export default function ExpenseTracker() {
   }));
 
   return (
-    <div className="min-h-screen gradient-warm pb-20">
+    <div className="min-h-screen pb-20" style={{ background: `linear-gradient(135deg, ${theme.gradientFrom}, ${theme.gradientTo})` }}>
       <TopBar title="Expense Tracker" showBack={false} />
 
       <main className="px-4 pt-4 animate-fadeIn">
         {/* Add Expense */}
-        <div className="bg-white rounded-2xl p-4 shadow-sm mb-5">
-          <h4 className="text-sm font-semibold text-gray-500 mb-3">Add New Expense</h4>
+        <div className="rounded-2xl p-4 shadow-sm mb-5" style={{ backgroundColor: theme.bgCard }}>
+          <h4 className="text-sm font-semibold mb-3" style={{ color: theme.textSecondary }}>Add New Expense</h4>
           <div className="space-y-3">
             <input
               type="text"
               placeholder="Description"
               value={desc}
               onChange={(e) => setDesc(e.target.value)}
-              className="w-full px-4 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#f65e1d] bg-gray-50"
+              className="w-full px-4 py-2.5 text-sm border rounded-xl outline-none"
+              style={{ backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.border }}
             />
             <div className="flex gap-2">
               <input
                 type="number"
-                placeholder="Amount ₹"
+                placeholder="Amount"
                 value={amount}
                 onChange={(e) => setAmount(e.target.value)}
-                className="flex-1 px-4 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#f65e1d] bg-gray-50"
+                className="flex-1 px-4 py-2.5 text-sm border rounded-xl outline-none"
+                style={{ backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.border }}
               />
               <select
                 value={category}
                 onChange={(e) => setCategory(e.target.value)}
-                className="px-3 py-2.5 text-sm border border-gray-200 rounded-xl outline-none focus:border-[#f65e1d] bg-gray-50 cursor-pointer"
+                className="px-3 py-2.5 text-sm border rounded-xl outline-none cursor-pointer"
+                style={{ backgroundColor: theme.inputBg, color: theme.text, borderColor: theme.border }}
               >
                 {CATEGORIES.map((c) => (
                   <option key={c} value={c}>{c}</option>
@@ -103,7 +108,8 @@ export default function ExpenseTracker() {
             <button
               onClick={handleAddExpense}
               disabled={loading || !desc.trim() || !amount}
-              className="w-full py-2.5 bg-[#f65e1d] hover:bg-[#e5531a] text-white font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border-none text-sm disabled:opacity-60"
+              className="w-full py-2.5 text-white font-semibold rounded-xl shadow-md transition-all flex items-center justify-center gap-2 cursor-pointer border-none text-sm disabled:opacity-60"
+              style={{ backgroundColor: theme.brand }}
             >
               {loading ? <Loader2 size={16} className="animate-spin" /> : <Plus size={16} />}
               Add Expense
@@ -113,8 +119,8 @@ export default function ExpenseTracker() {
 
         {/* Chart */}
         {chartData.length > 0 && (
-          <div className="bg-white rounded-2xl p-4 shadow-sm mb-5">
-            <h4 className="text-sm font-semibold text-gray-500 mb-3">Expense Breakdown</h4>
+          <div className="rounded-2xl p-4 shadow-sm mb-5" style={{ backgroundColor: theme.bgCard }}>
+            <h4 className="text-sm font-semibold mb-3" style={{ color: theme.textSecondary }}>Expense Breakdown</h4>
             <ResponsiveContainer width="100%" height={220}>
               <PieChart>
                 <Pie
@@ -130,8 +136,8 @@ export default function ExpenseTracker() {
                     <Cell key={i} fill={COLORS[i % COLORS.length]} />
                   ))}
                 </Pie>
-                <Legend iconSize={10} wrapperStyle={{ fontSize: '12px' }} />
-                <Tooltip formatter={(value) => `₹${value}`} />
+                <Legend iconSize={10} wrapperStyle={{ fontSize: '12px', color: theme.text }} />
+                <Tooltip formatter={(value) => `${'\u20B9'}${value}`} />
               </PieChart>
             </ResponsiveContainer>
           </div>
@@ -139,23 +145,23 @@ export default function ExpenseTracker() {
 
         {/* Expense List */}
         <div className="mb-4">
-          <h4 className="text-sm font-semibold text-gray-500 mb-3">Past Expenses</h4>
+          <h4 className="text-sm font-semibold mb-3" style={{ color: theme.textSecondary }}>Past Expenses</h4>
           {expenses.length === 0 ? (
-            <p className="text-sm text-gray-400 text-center py-6">No expenses recorded yet</p>
+            <p className="text-sm text-center py-6" style={{ color: theme.textMuted }}>No expenses recorded yet</p>
           ) : (
             <div className="space-y-2">
               {expenses.map((exp, i) => (
-                <div key={i} className="flex items-center justify-between bg-white rounded-xl p-3 shadow-sm">
+                <div key={i} className="flex items-center justify-between rounded-xl p-3 shadow-sm" style={{ backgroundColor: theme.bgCard }}>
                   <div className="flex items-center gap-3">
-                    <div className="w-8 h-8 rounded-full bg-orange-50 flex items-center justify-center">
-                      <Trash2 size={14} className="text-orange-400" />
+                    <div className="w-8 h-8 rounded-full flex items-center justify-center" style={{ backgroundColor: theme.brandBg }}>
+                      <Trash2 size={14} style={{ color: theme.brand }} />
                     </div>
                     <div>
-                      <p className="text-sm font-medium text-gray-800">{exp.category}</p>
-                      <p className="text-[10px] text-gray-400">{new Date(exp.date).toLocaleDateString()}</p>
+                      <p className="text-sm font-medium" style={{ color: theme.text }}>{exp.category}</p>
+                      <p className="text-[10px]" style={{ color: theme.textMuted }}>{new Date(exp.date).toLocaleDateString()}</p>
                     </div>
                   </div>
-                  <span className="text-sm font-bold text-red-500">-₹{exp.amount}</span>
+                  <span className="text-sm font-bold text-red-500">-{'\u20B9'}{exp.amount}</span>
                 </div>
               ))}
             </div>

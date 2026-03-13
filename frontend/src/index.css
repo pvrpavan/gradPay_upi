@@ -8,12 +8,13 @@
   }
   body {
     font-family: 'Inter', 'Segoe UI', system-ui, -apple-system, sans-serif;
-    background: #fff5ec;
+    background: var(--theme-bg, #fff5ec);
     min-height: 100vh;
     display: flex;
     justify-content: center;
     -webkit-font-smoothing: antialiased;
     -moz-osx-font-smoothing: grayscale;
+    transition: background 0.3s ease, color 0.3s ease;
   }
   #root {
     width: 100%;
@@ -21,30 +22,56 @@
     min-height: 100vh;
     position: relative;
   }
+
+  /* Responsive: allow wider on tablets */
+  @media (min-width: 640px) {
+    #root {
+      max-width: 480px;
+    }
+  }
+  @media (min-width: 768px) {
+    #root {
+      max-width: 520px;
+      box-shadow: 0 0 40px rgba(0,0,0,0.08);
+    }
+  }
 }
 
 @layer utilities {
   .gradient-orange {
-    background: linear-gradient(135deg, #f65e1d, #ff9800);
+    background: linear-gradient(135deg, var(--theme-brand, #f65e1d), var(--theme-brandLight, #ff9800));
   }
   .gradient-warm {
-    background: linear-gradient(135deg, #fef9f6, #fdefe8);
+    background: linear-gradient(135deg, var(--theme-gradientFrom, #fef9f6), var(--theme-gradientTo, #fdefe8));
   }
   .gradient-gold {
     background: linear-gradient(145deg, #fde1aa, #ffebc7);
   }
   .glass-effect {
-    background: rgba(255, 255, 255, 0.3);
+    background: var(--theme-bgGlass, rgba(255, 255, 255, 0.3));
     backdrop-filter: blur(10px);
   }
   .text-brand {
-    color: #f65e1d;
+    color: var(--theme-brand, #f65e1d);
   }
   .bg-brand {
-    background-color: #f65e1d;
+    background-color: var(--theme-brand, #f65e1d);
   }
   .border-brand {
-    border-color: #f65e1d;
+    border-color: var(--theme-brand, #f65e1d);
+  }
+
+  /* Theme-aware utility classes */
+  .theme-bg { background-color: var(--theme-bg); }
+  .theme-bg-card { background-color: var(--theme-bgCard); }
+  .theme-text { color: var(--theme-text); }
+  .theme-text-secondary { color: var(--theme-textSecondary); }
+  .theme-text-muted { color: var(--theme-textMuted); }
+  .theme-border { border-color: var(--theme-border); }
+  .theme-input {
+    background-color: var(--theme-inputBg);
+    color: var(--theme-text);
+    border-color: var(--theme-border);
   }
 }
 
@@ -211,12 +238,17 @@
 
 /* Glass morphism card */
 .glass-card {
-  background: rgba(255, 255, 255, 0.7);
+  background: var(--theme-bgGlass, rgba(255, 255, 255, 0.7));
   backdrop-filter: blur(12px);
-  border: 1px solid rgba(255, 255, 255, 0.3);
+  border: 1px solid var(--theme-border, rgba(255, 255, 255, 0.3));
 }
 
 /* Smooth page transitions */
 .page-enter {
   animation: fadeIn 0.3s ease-in-out, slideUp 0.3s ease;
+}
+
+/* Smooth theme transitions */
+body, .theme-transition {
+  transition: background-color 0.3s ease, color 0.3s ease, border-color 0.3s ease;
 }
