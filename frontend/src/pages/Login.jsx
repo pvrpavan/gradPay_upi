@@ -153,17 +153,20 @@ export default function Login() {
       </div>
 
       {/* Logo */}
-      <div className="flex items-center gap-2 mb-2">
-        <div className="w-12 h-12 rounded-2xl bg-gradient-to-br from-[#f65e1d] to-[#ff9800] flex items-center justify-center shadow-lg animate-3d-float">
-          <span className="text-white text-xl font-bold">G</span>
+      <div className="flex items-center gap-2 mb-2 animate-flip-in">
+        <div className="w-14 h-14 rounded-2xl bg-gradient-to-br from-[#f65e1d] to-[#ff9800] flex items-center justify-center shadow-lg animate-3d-float animate-glow-pulse">
+          <span className="text-white text-2xl font-bold">G</span>
         </div>
-        <h1 className="text-2xl font-bold text-gray-800">
-          <span className="text-[#f65e1d]">Gradious </span>Pay
-        </h1>
+        <div>
+          <h1 className="text-2xl font-bold text-gray-800">
+            <span className="text-[#f65e1d]">Gradious </span>Pay
+          </h1>
+          <p className="text-[10px] text-gray-400 -mt-0.5">Your Smart Payment Partner</p>
+        </div>
       </div>
 
       {/* Tagline */}
-      <p className="text-xs text-gray-400 mb-3 flex items-center gap-1">
+      <p className="text-xs text-gray-400 mb-3 flex items-center gap-1 animate-wave">
         <Lock size={12} /> Secure & Fast UPI Payments
       </p>
 
@@ -184,7 +187,7 @@ export default function Login() {
       </div>
 
       {/* Card */}
-      <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 animate-slideUp">
+      <div className="w-full max-w-sm bg-white/80 backdrop-blur-sm rounded-3xl shadow-xl p-6 animate-slideUp animate-tilt-3d" style={{ animationIterationCount: 1, animationDuration: '0.6s' }}>
         <button
           onClick={() => navigate('/')}
           className="flex items-center gap-1 text-gray-600 hover:text-[#f65e1d] mb-3 bg-transparent border-none cursor-pointer text-sm"
@@ -345,25 +348,43 @@ export default function Login() {
 
       {/* Features Section */}
       <div className="w-full max-w-sm mt-6 grid grid-cols-2 gap-3">
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm">
-          <CreditCard size={20} className="text-[#f65e1d] mb-2" />
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm card-3d animate-stagger-1">
+          <CreditCard size={20} className="text-[#f65e1d] mb-2 animate-wave" />
           <p className="text-xs font-semibold text-gray-700">Multiple Payment Modes</p>
           <p className="text-[10px] text-gray-400 mt-1">Bank, UPI, Cards & Wallet</p>
         </div>
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm">
-          <Zap size={20} className="text-green-500 mb-2" />
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm card-3d animate-stagger-2">
+          <Zap size={20} className="text-green-500 mb-2 animate-wave" />
           <p className="text-xs font-semibold text-gray-700">Instant Transfers</p>
           <p className="text-[10px] text-gray-400 mt-1">Send money in seconds</p>
         </div>
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm">
-          <ShieldCheck size={20} className="text-blue-500 mb-2" />
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm card-3d animate-stagger-3">
+          <ShieldCheck size={20} className="text-blue-500 mb-2 animate-wave" />
           <p className="text-xs font-semibold text-gray-700">Bank Grade Security</p>
           <p className="text-[10px] text-gray-400 mt-1">256-bit encryption always</p>
         </div>
-        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm">
-          <Award size={20} className="text-yellow-500 mb-2" />
+        <div className="bg-white/60 backdrop-blur-sm rounded-2xl p-4 shadow-sm card-3d animate-stagger-4">
+          <Award size={20} className="text-yellow-500 mb-2 animate-wave" />
           <p className="text-xs font-semibold text-gray-700">Earn Rewards</p>
           <p className="text-[10px] text-gray-400 mt-1">Get points on every transaction</p>
+        </div>
+      </div>
+
+      {/* Testimonials */}
+      <div className="w-full max-w-sm mt-5 animate-stagger-5">
+        <div className="bg-gradient-to-r from-[#f65e1d]/10 to-[#ff9800]/10 rounded-2xl p-4 shadow-sm">
+          <div className="flex items-center gap-2 mb-2">
+            <div className="flex -space-x-2">
+              {['bg-blue-400', 'bg-green-400', 'bg-purple-400'].map((bg, i) => (
+                <div key={i} className={`w-6 h-6 rounded-full ${bg} border-2 border-white flex items-center justify-center`}>
+                  <Users size={10} className="text-white" />
+                </div>
+              ))}
+            </div>
+            <span className="text-[10px] text-gray-500 font-medium">Trusted by 10M+ users</span>
+          </div>
+          <p className="text-xs text-gray-600 italic">"GradPay made my daily payments so easy. The instant transfers and rewards are amazing!"</p>
+          <p className="text-[10px] text-gray-400 mt-1">- Rahul S., Verified User</p>
         </div>
       </div>
 
