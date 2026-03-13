@@ -14,7 +14,7 @@ const UTILITY_TYPES = [
   { id: 'recharge', label: 'Recharge', icon: Smartphone, color: 'from-green-400 to-green-500', bgColor: 'bg-green-50 text-green-600' },
   { id: 'internet', label: 'Internet', icon: Wifi, color: 'from-blue-400 to-blue-500', bgColor: 'bg-blue-50 text-blue-600' },
   { id: 'dth', label: 'DTH / TV', icon: Tv, color: 'from-purple-400 to-purple-500', bgColor: 'bg-purple-50 text-purple-600' },
-  { id: 'gas', label: 'Gas', icon: Fuel, color: 'from-orange-400 to-orange-500', bgColor: 'bg-orange-50 text-orange-600' },
+  { id: 'gas', label: 'Gas', icon: Fuel, color: 'from-amber-400 to-amber-500', bgColor: 'bg-amber-50 text-amber-600' },
   { id: 'education', label: 'Education', icon: GraduationCap, color: 'from-indigo-400 to-indigo-500', bgColor: 'bg-indigo-50 text-indigo-600' },
   { id: 'travel', label: 'Travel', icon: Plane, color: 'from-pink-400 to-pink-500', bgColor: 'bg-pink-50 text-pink-600' },
 ];

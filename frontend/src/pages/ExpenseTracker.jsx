@@ -7,7 +7,7 @@ import BottomNav from '../components/BottomNav';
 import { PieChart, Pie, Cell, ResponsiveContainer, Legend, Tooltip } from 'recharts';
 import { Plus, Loader2, Trash2 } from 'lucide-react';
 
-const COLORS = ['#f65e1d', '#36A2EB', '#FFCE56', '#B180D7', '#5AD3D1', '#FF6384', '#4BC0C0'];
+const COLORS = ['#6C63FF', '#36A2EB', '#FFCE56', '#B180D7', '#5AD3D1', '#FF6384', '#4BC0C0'];
 const CATEGORIES = ['Food', 'Transport', 'Shopping', 'Entertainment', 'Bills', 'Education', 'Other'];
 
 export default function ExpenseTracker() {

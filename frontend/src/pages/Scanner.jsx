@@ -78,9 +78,10 @@ export default function Scanner() {
   const handlePayFromScan = () => {
     const match = scanResult.match(/pa=([^&]+)/);
     if (match) {
-      navigate(`/send-money?upi=${match[1]}`);
+      // Navigate to chat with this user for payment
+      navigate(`/chat?with=${match[1]}&pay=true`);
     } else {
-      navigate('/send-money');
+      navigate('/chat');
     }
   };
 

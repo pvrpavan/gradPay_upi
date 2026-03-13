@@ -1,7 +1,7 @@
 import { useTheme } from '../context/ThemeContext';
 
 const AVATAR_COLORS = [
-  ['#f97316', '#ea580c'],
+  ['#6C63FF', '#5B54E6'],
   ['#3b82f6', '#2563eb'],
   ['#22c55e', '#16a34a'],
   ['#a855f7', '#9333ea'],
