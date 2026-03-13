@@ -2,6 +2,7 @@ import { useState, useEffect } from 'react';
 import { useNavigate } from 'react-router-dom';
 import { useAuth } from '../context/AuthContext';
 import { useTheme } from '../context/ThemeContext';
+import { useToast } from '../context/ToastContext';
 import { api } from '../utils/api';
 import TopBar from '../components/TopBar';
 import UpiPinModal from '../components/UpiPinModal';
@@ -13,6 +14,7 @@ export default function SendMoney() {
   const navigate = useNavigate();
   const { phone } = useAuth();
   const { theme } = useTheme();
+  const { showSuccess, showError } = useToast();
   const [profile, setProfile] = useState(null);
   const [searchQuery, setSearchQuery] = useState('');
   const [selectedUser, setSelectedUser] = useState(null);
@@ -85,13 +87,16 @@ export default function SendMoney() {
 
       if (data.message === 'Transaction successful') {
         setSuccess(true);
+        showSuccess('Payment successful!');
         setTimeout(() => navigate('/dashboard'), 2500);
       } else {
         setError(data.message || 'Transaction failed.');
+        showError(data.message || 'Transaction failed.');
       }
     } catch {
       setShowProcessing(false);
       setError('Error processing transaction.');
+      showError('Error processing transaction.');
     }
   };
 
@@ -207,7 +212,7 @@ export default function SendMoney() {
                 />
               </div>
 
-              {error && <p className="text-red-500 text-sm">{error}</p>}
+              {error && <p className="text-sm" style={{ color: theme.danger }}>{error}</p>}
 
               <button
                 onClick={handleInitiateSend}
