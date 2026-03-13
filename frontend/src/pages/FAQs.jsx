@@ -1,11 +1,12 @@
 import { useState } from 'react';
 import { useNavigate } from 'react-router-dom';
+import { useTheme } from '../context/ThemeContext';
 import { ArrowLeft, HelpCircle, ChevronDown } from 'lucide-react';
 
 const faqs = [
   {
     q: 'How do I send money?',
-    a: 'Open the app → Tap "Send Money" → Search by phone or UPI ID → Enter amount → Confirm & Send.',
+    a: 'Open the app \u2192 Tap "Send Money" \u2192 Search by phone or UPI ID \u2192 Enter amount \u2192 Confirm & Send.',
   },
   {
     q: 'How do I check my balance?',
@@ -39,12 +40,13 @@ const faqs = [
 
 export default function FAQs() {
   const navigate = useNavigate();
+  const { theme } = useTheme();
   const [activeIndex, setActiveIndex] = useState(null);
 
   return (
-    <div className="min-h-screen bg-gradient-to-b from-orange-50 to-orange-100 animate-fadeIn">
+    <div className="min-h-screen animate-fadeIn" style={{ background: `linear-gradient(135deg, ${theme.gradientFrom}, ${theme.gradientTo})` }}>
       {/* Header */}
-      <header className="flex items-center justify-between px-5 py-3 bg-[#f65e1d] text-white rounded-t-lg shadow-md">
+      <header className="flex items-center justify-between px-5 py-3 text-white rounded-t-lg shadow-md" style={{ background: `linear-gradient(135deg, ${theme.brand}, ${theme.brandLight})` }}>
         <div className="flex items-center gap-3">
           <button onClick={() => navigate(-1)} className="bg-transparent border-none cursor-pointer text-white">
             <ArrowLeft size={22} />
@@ -59,26 +61,29 @@ export default function FAQs() {
         {faqs.map((faq, i) => (
           <div
             key={i}
-            className={`bg-white rounded-2xl shadow-sm overflow-hidden transition-all duration-300 ${
+            className={`rounded-2xl shadow-sm overflow-hidden transition-all duration-300 ${
               activeIndex === i ? 'shadow-md' : ''
             }`}
+            style={{ backgroundColor: theme.bgCard }}
           >
             <button
               onClick={() => setActiveIndex(activeIndex === i ? null : i)}
               className="w-full flex items-center justify-between px-4 py-4 bg-transparent border-none cursor-pointer text-left"
             >
-              <span className="text-sm font-medium text-gray-700 pr-2">{faq.q}</span>
+              <span className="text-sm font-medium pr-2" style={{ color: theme.text }}>{faq.q}</span>
               <ChevronDown
                 size={18}
-                className={`text-[#f65e1d] flex-shrink-0 transition-transform duration-300 ${
+                className={`flex-shrink-0 transition-transform duration-300 ${
                   activeIndex === i ? 'rotate-180' : ''
                 }`}
+                style={{ color: theme.brand }}
               />
             </button>
             <div
-              className={`px-4 text-sm text-gray-500 leading-relaxed transition-all duration-300 overflow-hidden ${
+              className={`px-4 text-sm leading-relaxed transition-all duration-300 overflow-hidden ${
                 activeIndex === i ? 'max-h-40 pb-4' : 'max-h-0'
               }`}
+              style={{ color: theme.textSecondary }}
             >
               {faq.a}
             </div>
